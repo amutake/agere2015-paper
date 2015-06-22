@@ -1,7 +1,7 @@
-AGERE! 2015 paper
+[AGERE! 2015](http://soft.vub.ac.be/AGERE15/) paper
 =================
 
-This is the repository for my AGERE! 2015 paper.
+This is the repository for my [AGERE! 2015](http://soft.vub.ac.be/AGERE15/) paper.
 
 Important Dates
 ---------------
