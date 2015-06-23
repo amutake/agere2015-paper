@@ -8,12 +8,14 @@ Compilation
 -----------
 
 ```
-latex sig-alternate
-bibtex sig-alternate
-latex sig-alternate
-dvipdf sig-alternate
+make
 ```
 
+The following tools are required.
+
+- make
+- latexmk
+- lualatex
 
 Information
 -----------
