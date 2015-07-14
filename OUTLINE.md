@@ -5,7 +5,6 @@
   3. coq?
   4. why is verification important
   5. これはアクターに関して何を検証したいか
-(2. example)
 2. syntax
   1. name (what is generation (child) number)
   2. message
@@ -27,7 +26,6 @@
   3. infinitely often enabled
   4. eventually processed
   5. fairness
-(6. extraction to Erlang)
 6. related work
   - Athena (it can't generate actors dynamically)
   - Verdi (not actor)
