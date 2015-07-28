@@ -1,0 +1,64 @@
+\section{semantics}
+
+操作的意味論を labeled transition system として形式化する。
+ラベルとして receive, send, new, self の4つを用意する。
+
+\begin{lstlisting}
+  Inductive label :=
+  | Receive (to : name) (from : name) (content : message) (* `to` receives a message `content` from `from` *)
+  | Send (from : name) (to : name) (content : message)    (* `from` sends a message `content` to `to` *)
+  | New (child : name)                                    (* an actor named `child` is created *)
+  | Self (me : name).                                     (* `me` gets own name *)
+\end{lstlisting}
+
+\texttt{Receive (to : name) (from : name) (content : message)} は to という名前のアクターが from という名前のアクターからのメッセージ content を受け取ったということを表す。
+\texttt{Send (from : name) (to : name) (content : message)} は from という名前のアクターが to という名前のアクターに向けてメッセージ content を送ったということを表す。
+\texttt{New (child : name)} は child という名前の新しいアクターを生成したということを表し、
+\texttt{Self (me : name)} は me という名前のアクターが自分自身の名前を読みだしたということを表す。
+
+このラベル一つ一つに対応した意味論は図\ref{semantics}にある。
+receive はメッセージ待ち状態にあるアクターが、自身に向けて送られたメッセージを受け取り、アクションの列を生成する遷移である。
+send はあるアクターが他のアクターに向けてメッセージを送る遷移。
+...
+これを Coq 上で定義すると図\ref{coq:semantics}のようになる。ほとんどそのままだが集合の代わりにリストを使っている。なぜならば...
+
+(意味論の図)
+
+
+
+\begin{lstlisting}
+Reserved Notation "c1 '~(' t ')~>' c2" (at level 60).
+Inductive trans : label -> config -> config -> Prop :=
+(* receive transition *)
+| trans_receive :
+    forall to from content f gen sendings_l sendings_r actors_l actors_r,
+      (sendings_l ++ Build_sending to from content :: sendings_r)
+                 >< (actors_l ++ Build_actor to (become (receive f)) gen :: actors_r)
+        ~(Receive to from content)~>
+        (sendings_l ++ sendings_r) >< (actors_l ++ Build_actor to (f content) gen :: actors_r)
+(* send transition *)
+| trans_send :
+    forall from to content cont gen sendings_l sendings_r actors_l actors_r,
+      (sendings_l ++ sendings_r)
+                 >< (actors_l ++ Build_actor from (send to content cont) gen :: actors_r)
+         ~(Send from to content)~>
+         (sendings_l ++ Build_sending to from content :: sendings_r)
+           >< (actors_l ++ Build_actor from cont gen :: actors_r)
+(* new transition *)
+| trans_new :
+    forall parent behv cont gen sendings actors_l actors_r,
+      sendings >< (actors_l ++ Build_actor parent (new behv cont) gen :: actors_r)
+        ~(New (generated gen parent))~>
+        sendings ><
+          (Build_actor (generated gen parent) (become behv) 0 ::
+          actors_l ++
+          Build_actor parent (cont (generated gen parent)) (S gen) ::
+          actors_r)
+(* self transition *)
+| trans_self :
+    forall me cont gen sendings actors_l actors_r,
+      sendings >< (actors_l ++ Build_actor me (self cont) gen :: actors_r)
+        ~(Self me)~>
+        sendings >< (actors_l ++ Build_actor me (cont me) gen :: actors_r)
+where "c1 '~(' t ')~>' c2" := (trans t c1 c2).
+\end{lstlisting}
