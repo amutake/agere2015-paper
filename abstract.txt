@@ -1,0 +1,34 @@
+Title:
+Actario: A Framework for Reasoning About Actor Systems
+
+Authors:
+Shohei Yasutake
+Department of Computer Science
+Tokyo Institute of Technology
+2-12-1 Ookayama, Meguroku, Tokyo 152-8552, Japan
+e-mail: yasutake@psg.cs.titech.ac.jp
+TEL: +81-3-5734-3690
+FAX: +81-3-5734-2772
+
+Takuo Watanabe
+Department of Computer Science
+Tokyo Institute of Technology
+2-12-1 Ookayama, Meguroku, Tokyo 152-8552, Japan
+e-mail: takuo@acm.org
+TEL: +81-3-5734-3690
+FAX: +81-3-5734-2772
+
+Abstract:
+The two main characteristics of the Actor model are asynchronous
+message passing and dynamic system topology. The latter relies on the
+on-the-fly creation of actor names that often complicates the formal
+treatment of systems described in the Actor model. In this paper, we
+introduce Actario, a formalization of the Actor model in Coq. Actario
+incorporates a name creation mechanism that is formally proven to
+generate a consistent set of actor names. The mechanism helps proper
+handling of names in modeling and reasoning about actor-based
+systems. Actario also provides a code extraction mechanism that
+generates Erlang programs.
+
+Keywords:
+Actor Model, Formalization, Actario, Coq, Erlang

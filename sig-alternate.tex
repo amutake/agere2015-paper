@@ -143,11 +143,7 @@ Takuo Watanabe\\
 
 \maketitle
 \begin{abstract}
-The Actor model is a model of concurrent computation based on autonomous computing entities called actors that communicate through asynchronous message passing.
-The properties of the Actor model include uniqueness and freshness of actor names and persistency of actors.
-Agha and Thati proposed a typed asynchronous variant of \(\pi\)-calculus called A\(\pi\)-calculus whose type system imposes these properties.
-In A\(\pi\)-calculus, the soundness of the type system means that a typed term certainly behaves as an actor configuration.
-This paper reports our formal proof of the soundness using Coq by reconsidering the definitions of the terms and types of the calculus.
+The two main characteristics of the Actor model are asynchronous message passing and dynamic system topology. The latter relies on the on-the-fly creation of actor names that often complicates the formal treatment of systems described in the Actor model. In this paper, we introduce Actario, a formalization of the Actor model in Coq. Actario incorporates a name creation mechanism that is formally proven to generate a consistent set of actor names. The mechanism helps proper handling of names in modeling and reasoning about actor-based systems. Actario also provides a code extraction mechanism that generates Erlang programs.
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -157,7 +153,7 @@ This paper reports our formal proof of the soundness using Coq by reconsidering 
 
 \terms{Actors, Formal Models}
 
-\keywords{Actors, Pi-calculus, Coq, Types, Soundness
+\keywords{Actor Model, Formalization, Actario, Coq, Erlang}
 
 \section{Introduction}
 
