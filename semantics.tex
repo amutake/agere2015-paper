@@ -22,7 +22,30 @@ send はあるアクターが他のアクターに向けてメッセージを送
 ...
 これを Coq 上で定義すると図\ref{coq:semantics}のようになる。ほとんどそのままだが集合の代わりにリストを使っている。なぜならば...
 
-(意味論の図)
+\begin{figure}[h]
+  \infrule[Receive]{
+  }{
+    sendings \uplus \{Sending(to, from, content)\} \bowtie actors \cup \{Actor(to, become(behv), next)\} \leadsto^{Receive(to, from, content)}
+    sendings \bowtie actors \cup \{Actor(to, behv(content), next)\}
+  }
+  \infrule[Send]{
+  }{
+    sendings \bowtie actors \cup \{Actor(from, to \ ! \ content; cont, next)\} \leadsto^{Send(from, to, content)}
+    sendings \uplus \{Sending(to, from, content)\} \bowtie actors \cup \{Actor(from, cont, next)\}
+  }
+  \infrule[New]{
+  }{
+    sendings \bowtie actors \cup \{Actor(parent, n \leftarrow new behv; cont, next)\} \leadsto^{New(child)}
+    sendings \bowtie actors \cup \{Actor(parent, cont{n/child}, next + 1), Actor(child, become(behv), 0)\}
+    where child := Generated(next, parent)
+  }
+  \infrule[Self]{
+  }{
+    sendings \bowtie actors \cup \{Actor(me, n \leftarrow self; cont, next)\} \leadsto^{Self(me)}
+    sendings \bowtie actors \cup \{Actor(me, cont{n/me}, next)\}
+  }
+\end{figure}
+
 
 
 

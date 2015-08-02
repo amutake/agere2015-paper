@@ -1,26 +1,21 @@
 \section{Introduction}
-The \textit{proceedings} are the records of a conference.
-ACM seeks to give these conference by-products a uniform,
-high-quality appearance.  To do this, ACM has some rigid
-requirements for the format of the proceedings documents: there
-is a specified format (balanced  double columns), a specified
-set of fonts (Arial or Helvetica and Times Roman) in
-certain specified sizes (for instance, 9 point for body copy),
-a specified live area (18 $\times$ 23.5 cm [7" $\times$ 9.25"]) centered on
-the page, specified size of margins (1.9 cm [0.75"]) top, (2.54 cm [1"]) bottom
-and (1.9 cm [.75"]) left and right; specified column width
-(8.45 cm [3.33"]) and gutter size (.83 cm [.33"]).
+アクターモデルは並行計算のモデルの一つである。
+アクターモデルではアクターと呼ばれる計算実体が非同期にメッセージを送り合うことで計算を進める。
+あるアクターがメッセージに対してどういう動作を行うか、ということをそのアクターの振る舞いという。
+アクターはメッセージを受け取ると、新しいアクターを作る、他のアクターにメッセージを送る、自分自身の振る舞いを変える、という3つの動作を行うことができる。
 
-The good news is, with only a handful of manual
-settings\footnote{Two of these, the {\texttt{\char'134 numberofauthors}}
-and {\texttt{\char'134 alignauthor}} commands, you have
-already used; another, {\texttt{\char'134 balancecolumns}}, will
-be used in your very last run of \LaTeX\ to ensure
-balanced column heights on the last page.}, the \LaTeX\ document
-class file handles all of this for you.
+アクターの名前は必ず一意である必要がある。
+アクターはシステムの進行に伴って動的に生成されるが、その中で fresh でない名前の生成が行われることはない。
+fresh なアクターの名前の付け方には、~がある。
 
-The remainder of this document is concerned with showing, in
-the context of an ``actual'' document, the \LaTeX\ commands
-specifically available for denoting the structure of a
-proceedings paper, rather than with giving rigorous descriptions
-or explanations of such commands.
+%% jssst2014のintroから
+アクターモデルに基づく言語は多数提案・実装されてきており、それらの研究成果をもとに現在 Erlang、Akka 等、アクターモデルを並行計算の基盤としたプログラミング言語やライブラリが実用に供されている。
+そのため、アクターモデルに寄って構成されたシステムの形式的検証は喫緊の課題であると考えられる。
+
+形式的検証については、アクターで記述されたシステムのモデル検査を可能にするモデル記述言語 Rebeca、
+証明支援系 Athena を用いた形式化、
+および Coq を用いたアクターモデルの定式化など、
+最近になっていくつかの研究成果が出ている。
+本研究では、アクターモデルの
+
+Athena を用いた形式化では、

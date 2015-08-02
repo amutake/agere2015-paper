@@ -1,0 +1,17 @@
+\section{Related Work}
+
+Appl\(\pi\) is a Coq library for modeling and verifying concurrent programs.
+Actario is very inspired by Appl\(\pi\), for example, the definition of fairness, continuation passing style in \texttt{actions} and framework design.
+The main difference of Appl\(\pi\) and Actario is that Appl\(\pi\) adopts \(\pi\)-calculus for its concurrent computation basic, but Actario adopts the Actor model for its concurrent computation basic.
+
+Musser and Varela are formalized the Actor model in the Athena theorem prover \ref{}.
+これは transition path を遷移のラベルの列としている。
+この形式化では遷移の間で名前の一意性が証明されているが、 % note: creating, trans-create, unique-ids-persistence in transition.ath
+この形式化を用いてプログラミングする際には名前をプログラマが明示的に与えなければならないので、アクターを生成するときには名前が重複しないように注意深く設定しなければならない。
+
+Verdi is a framework for constructing and verifying fault-tolerant distributed systems.
+故障がまったくない意味論上で作ったシステムを、メッセージのドロップや重複、マシンの以上終了などを含む意味論上でも正常に動作 (ここでいう正常に動作とは、そのシステムについて成り立っていてほしい性質が成り立ついるということ) するシステムへと変換する仕組みが備わっている。
+Actario の目標の一つも分散システムの検証で、Actario では Erlang や Akka で採用されているような Supervisor を使った耐障害性のあるシステムに対しての検証を目指している。
+
+Tony Garnock-Jones らはアクターモデルの形式化を Coq を使って与えている。
+しかしこれはアクターシステムが決定的に遷移するような形式化となっており、一般的に非決定的に進行する現実のシステムには適用しづらいものとなっている。
