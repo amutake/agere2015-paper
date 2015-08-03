@@ -6,6 +6,8 @@
 \definecolor{dkblue}{rgb}{0,0,0.6}
 \definecolor{ltblue}{rgb}{0.2,0.2,1}
 
+\newcommand\doubleplus{+\kern-1.2ex+\kern0.8ex}
+
 \lstdefinelanguage{Coq}{
   %
   % Anything betweeen $ becomes LaTeX math mode
@@ -174,6 +176,9 @@
   {\\times}{{$\times$}}1
   {\\xorb}{{$\oplus$}}1
   {\\andb}{{$\wedge$}}1
+  {><}{{$\bowtie$}}1
+  {++}{{$\doubleplus$}}1
+  {~>}{{$\leadsto$}}1
   %
 }[keywords,strings]
 
