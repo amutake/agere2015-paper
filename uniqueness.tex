@@ -17,10 +17,10 @@ trans invariant は以下の3つ
 システム内のすべてのアクターについて、もし自分が何らかのアクターに生成されたものならば親アクターもそのシステム内に存在する、というアクターの集合についての述語をここでは chain と呼ぶ。
 論理式にすると以下のようになる。(ここでは Coq の定義はあまり出したくない。なぜかというと SSReflect を使っていて説明が面倒だから)
 
-\begin{equation}
-  chain(actors : list actor) :=
-  \forall a \in actors, \exists p, p = parent(a) \rightarrow p \in actors
-\end{equation}
+\begin{flalign*}
+  chain(& actors : list actor) := \\
+  & \forall a \in actors, \exists p, p = parent(a) \Rightarrow p \in actors
+\end{flalign*}
 
 これの証明は...
 
@@ -28,12 +28,17 @@ trans invariant は以下の3つ
 システム内のすべてのアクターについて、次に生成するアクターの名前は必ず fresh である、というアクターの集合についての述語をここでは gen\_fresh と呼ぶ。
 gen\_fresh の定義は少し複雑になっている。次に生成するアクターの名前が必ず fresh であるということを、以下のように翻訳する。
 
-\begin{equation}
-  gen_fresh(actors : list actor) :=
-  \forall a \in actors, \exists p, p = parent(a) \wedge p \in actors \rightarrow gen_number(a) < next_number(p)
-\end{equation}
+\begin{flalign*}
+  gen\_fresh(actors\ :\ & list\ actor) := \\
+    \forall a \in actors, \exists p, & p = parent(a) \wedge \\
+    & p \in actors \Rightarrow gen\_number(a) < \\
+    & next\_number(p)
+\end{flalign*}
 
-つまり、あるアクターについて、システム内に親アクターがいる場合、親アクターが次に生成する番号は自分の番号よりも大きい、ということにより、次に生成するアクターの名前が被らないようになっている。ただし、次に生成するアクターの名前は fresh でもその次に生成するアクターは fresh ではないこともある。例えば、同じ名前でかつ次の generation number も同じという2つのアクターがいた場合、まず片方のアクターが生成するアクターの名前は fresh だが、その次にもう片方のアクターがアクターを生成したとすると、名前が被ってしまう。また、親アクターがシステム内に存在せずに、親の親は存在しているという場合、親の親が次に生成するアクターの名前は被らないが、その子アクターが次に生成する名前は被ってしまう可能性がある。(図？)
+つまり、あるアクターについて、システム内に親アクターがいる場合、親アクターが次に生成する番号は自分の番号よりも大きい、ということにより、次に生成するアクターの名前が被らないようになっている。
+ただし、次に生成するアクターの名前は fresh でもその次に生成するアクターは fresh ではないこともある。
+例えば、同じ名前でかつ次の generation number も同じという2つのアクターがいた場合、まず片方のアクターが生成するアクターの名前は fresh だが、その次にもう片方のアクターがアクターを生成したとすると、名前が被ってしまう。
+また、親アクターがシステム内に存在せずに、親の親は存在しているという場合、親の親が次に生成するアクターの名前は被らないが、その子アクターが次に生成する名前は被ってしまう可能性がある。(図？)
 
 以上のように gen\_fresh だけでは gen\_fresh を導けないので、gen\_fresh の証明には chain と no\_dup の性質が必要になる。
 
@@ -51,8 +56,26 @@ gen\_fresh の定義は少し複雑になっている。次に生成するアク
 
 以下のように表す。
 
-\begin{equation}
-  no_dup(actors : list actor) :=
-  \forall a \in actors, name(a) \notin names(actors - \{a\})
-  where names : Set of Actor -> Set of name
-\end{equation}
+\begin{flalign*}
+  no\_dup(& actors : list actor) := \\
+  & \forall a \in actors, name(a) \notin names(actors - \{a\}) \\
+  & \mbox{where } names : set\ actor \Rightarrow set\ name
+\end{flalign*}
+
+以下を証明
+
+\begin{lstlisting}
+  forall conf conf' label,
+  conf ~(label)~> conf' ->
+  gen_fresh conf -> no_dup conf ->
+  gen_fresh conf'
+\end{lstlisting}
+
+\subsection{uniqueness}
+まず遷移前について trans\_invariant が成り立っていれば、遷移後も trans\_invariant が成り立つという補題を証明する。
+これは chain, gen\_fresh, no\_dup で証明したものから自明に導ける。
+
+次に初期状態について trans\_invariant が成り立っていれば、任意回の遷移後も trans\_invariant が成り立つということをを証明する。
+これは遷移について帰納法を使い、上の補題を使えば証明できる。
+
+名前の一意性を表す式は no\_dup で、これは trans\_invariant に含まれているので、上の補題から、初期状態について trans\_invariant が成り立っていれば、どんな遷移をしても名前が重複しないという定理は導ける。
