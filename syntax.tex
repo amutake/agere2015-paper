@@ -4,13 +4,13 @@ Actario では
 
 以下のように定義する。
 
-\begin{equation}
-  configuration ::= multiset of in\_flight\_message \bowtie set of actor
-  actor ::= Actor(name, actions, \mathbb{N})
-  name ::= toplevel | generated(\mathbb{N}, name)
-  actions ::= name ! message; actions
-  | new behavior
-\end{equation}
+\begin{align*}
+  configuration & ::= multiset of in\_flight\_message \bowtie set of actor \\
+  actor & ::= Actor(name, actions, \mathbb{N}) \\
+  name & ::= toplevel | generated(\mathbb{N}, name) \\
+  actions & ::= name ! message; actions \\
+  & \mid new behavior
+\end{align*}
 
 
 \subsection{Actor Name}
@@ -105,13 +105,32 @@ Record actor := {
 まだ受け取られていないメッセージを表す。
 configuration に用いる。
 
+\begin{lstlisting}
+Record in_flight_message := {
+  to : name;
+  from : name;
+  content : message
+}.
+\end{lstlisting}
+
 \subsection{configuration}
-actor の列と in\_flight\_message の列のペア
+configuration はアクターシステムの現在のスナップショットを表す。
+configuration はアクターモデルの意味論を定義する際に用いるものである。
+Actario では configuration を actor の列と in\_flight\_message の列のペアとして定義する。
+
+\begin{lstlisting}
+Record config := {
+  in_flight_messages : seq in_flight_message;
+  actors : seq actor
+}.
+\end{lstlisting}
 
 \footnote{seq は ssreflect で定義されているもので、Coq の list の notation。}
 
 \subsection{Example: factorial system}
 例として階乗を計算するアクターシステムを定義する。
+このシステムは、与えられた自然数 n に対して、n の階乗を計算した結果を、与えられた名前のアクターに対して送信するシステムである。
+次に何をかけるかという情報を持った (continuation を持った) アクターを作るシステムになっている。\ref{agha:2004}
 
 \begin{lstlisting}
 CoFixpoint factorial_cont_behv (val : nat) (cust : name) : behavior :=
@@ -144,3 +163,10 @@ Definition factorial_system (n : nat) (parent : name) : config :=
          become empty_behv
        ).
 \end{lstlisting}
+
+まず、\texttt{factorial\_cont\_behv} と \texttt{factorial\_behv} を定義している。
+これはそれぞれ何をかければいいかという自然数を保持するアクターと、それを作るアクターの振る舞いになっている。
+The reason why these are defined using \texttt{CoFixpoint} is to define recursive function with no decreasing.
+Coq's \texttt{Fixpoint}, used in definition of recursive function, imposes decreasing of size of argument so we cannot use \texttt{Fixpoint}.
+次に \texttt{factorial\_system} という関数を定義している。
+これはシステムを走らせるための関数になっている。
