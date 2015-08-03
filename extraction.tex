@@ -1,0 +1,54 @@
+\section{Extraction}
+Actario は、Actario のシンタックスで書いたアプリケーションを Erlang に変換する仕組みも備わっており、Actario 上で書いたコードを実際に動作させるということが可能になっている。
+Coq にはもともと OCaml, Haskell, Scheme への extraction が可能であるが、これ以外の言語への抽出や、抽出のアルゴリズム自体を変更したい場合は Coq へのパッチまたは Coq のプラグインとして実装する必要がある。
+Actario が持っている Erlang への extraction の機構は、通常の extraction とは違い、Actario のメッセージパッシングのシンタックスと Erlang の持つメッセージパッシングのシンタックスを対応させたものになっている。
+extraction の際にプログラムの意味が変わらないということは証明されていない。
+
+\subsection{データ型}
+
+代数的データ型の値は Erlang ではラベル付きのタプルとして抽出する。
+
+\begin{lstlisting}
+(* Inductive nat :=  *)
+(* | O : nat         *)
+(* | S : nat -> nat. *)
+
+O (* => {o} *)
+S (S (S O)) (* => {s, {s, {s, o}}} *)
+\end{lstlisting}
+
+ただし、アクターモデル特有である動作、例えば send, new, self, become, receive は、Actario では\texttt{actions}, \texttt{behavior} 型の値コンストラクタとして実装されているので、これだとただのタプルのデータとして抽出されてしまう。
+このようなアクションは Erlang では構文または関数となっているため、このようなアクションだけを特別扱いして、対応する Erlang のものに変換する必要がある。
+
+例えば、以下の Actario を用いた Coq のコードは、
+
+\begin{lstlisting}
+CoFixpoint behvA :=
+  receive (fun msg =>
+    match msg with
+      | name_msg sender =>
+        me <- self;
+        sender ! name_msg me;
+        become behvA
+      | _ =>
+        child <- new behvB;
+        child ! msg;
+        become behvA
+    end)
+\end{lstlisting}
+
+以下のように抽出されるようにする。
+
+\begin{lstlisting}
+behvA() ->
+  receive Msg -> case Msg of
+    {name_msg, Sender} ->
+      Me = self(),
+      Sender ! {name_msg, Me},
+      behvA()
+    _ ->
+      Child = spawn(fun() -> behvB() end),
+      Child ! Msg
+      behvA()
+  end.
+\end{lstlisting}
