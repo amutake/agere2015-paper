@@ -194,4 +194,45 @@ The two main characteristics of the Actor model are asynchronous message passing
 %
 %APPENDICES are optional
 %\balancecolumns
+\appendix
+\section{labeled transition semantics in Actario}
+\begin{figure}[t]
+\begin{lstlisting}
+Reserved Notation "c1 '~(' t ')~>' c2" (at level 60).
+Inductive trans : label -> config -> config -> Prop :=
+(* receive transition *)
+| trans_receive :
+    forall to from content f gen sendings_l sendings_r actors_l actors_r,
+      (sendings_l ++ Build_sending to from content :: sendings_r)
+                 >< (actors_l ++ Build_actor to (become (receive f)) gen :: actors_r)
+        ~(Receive to from content)~>
+        (sendings_l ++ sendings_r) >< (actors_l ++ Build_actor to (f content) gen :: actors_r)
+(* send transition *)
+| trans_send :
+    forall from to content cont gen sendings_l sendings_r actors_l actors_r,
+      (sendings_l ++ sendings_r)
+                 >< (actors_l ++ Build_actor from (send to content cont) gen :: actors_r)
+         ~(Send from to content)~>
+         (sendings_l ++ Build_sending to from content :: sendings_r)
+           >< (actors_l ++ Build_actor from cont gen :: actors_r)
+(* new transition *)
+| trans_new :
+    forall parent behv cont gen sendings actors_l actors_r,
+      sendings >< (actors_l ++ Build_actor parent (new behv cont) gen :: actors_r)
+        ~(New (generated gen parent))~>
+        sendings ><
+          (Build_actor (generated gen parent) (become behv) 0 ::
+          actors_l ++
+          Build_actor parent (cont (generated gen parent)) (S gen) ::
+          actors_r)
+(* self transition *)
+| trans_self :
+    forall me cont gen sendings actors_l actors_r,
+      sendings >< (actors_l ++ Build_actor me (self cont) gen :: actors_r)
+        ~(Self me)~>
+        sendings >< (actors_l ++ Build_actor me (cont me) gen :: actors_r)
+where "c1 '~(' t ')~>' c2" := (trans t c1 c2).
+\end{lstlisting}
+\caption{definition of labeled transition semantics in Actario}\label{fig:coq:semantics}
+\end{figure}
 \end{document}
