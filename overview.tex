@@ -1,166 +1,147 @@
 \section{Overview of Actario}
 \label{sec:overview}
 
-Actario では
+Actario はアクターモデルを使ったアプリケーションのフレームワーク。
+Actario を使ったアプリケーションの構築は以下のような流れになる。
 
-以下のように定義する。
+\begin{enumerate}
+\item Actario の提供するシンタックスを使ってプログラミングする
+\item プログラムの性質の検証
+\item Erlang へ変換して実行
+\end{enumerate}
+
+現在 Actario を使ったプログラムの検証は、検証するための道具が少なく、難しくなっている。
+けれども Actario が提供する構文と意味論は、name uniqueness, actor persistence, message persistence というアクターモデルの性質を満たすことが証明されている。
+
+\subsection{Example: factorial system}
+まず Actario を使った例として、階乗を計算するアクターシステムを説明する。
+このシステムは、与えられた自然数 n に対して、n の階乗を計算した結果を、与えられた名前のアクターに対して送信するシステムである。
+次に何をかけるかという情報を持った (continuation を持った) アクターを作るシステムになっている。
+図\ref{fig:fact}はこのシステムの実行を図示したものである。
+実線はメッセージの送信を、破線はアクターの生成を表している。
+縦の列が同じ丸は同じアクターであることを表している。
+まず階乗を行いたい自然数を受け取ったアクターは0になるまで継続を保持するアクターを1ずつ減らしながら作る。
+0になったら継続を保持していたアクターにメッセージを送り、1,2,3 ... とかけていく。
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=8cm]{./images/fact.pdf}
+  \caption{factorial system}\label{fig:fact}
+\end{figure}
+
+\begin{figure}[t]
+  \begin{lstlisting}
+CoFixpoint factorial_cont_behv (val : nat) (cust : name) :=
+  receive (fun msg =>
+    match msg with
+      | nat_msg arg =>
+        cust ! nat_msg (val * arg);
+        become empty_behv
+      | _ => become (factorial_cont_behv val cust)
+    end).
+
+CoFixpoint factorial_behv :=
+  receive (fun msg =>
+    match msg with
+      | tuple_msg (nat_msg 0) (name_msg cust) =>
+        cust ! nat_msg 1;
+        become factorial_behv
+      | tuple_msg (nat_msg (S n)) (name_msg cust) =>
+        cont <- new (factorial_cont_behv (S n) cust);
+        me <- self;
+        me ! tuple_msg (nat_msg n) (name_msg cont);
+        become factorial_behv
+      | _ => become factorial_behv
+    end).
+
+Definition factorial_system (n : nat) (cust : name) :=
+  init "factorial" (
+    x <- new factorial_behv;
+    x ! tuple_msg (nat_msg n) (name_msg cust);
+    become empty_behv
+  ).
+  \end{lstlisting}
+  \caption{factorial system by Actario}\label{coq:fact}
+\end{figure}
 
 
+図\ref{coq:fact}は Actario でこのシステムを記述した例である。
+\texttt{factorial\_cont\_behv}および\texttt{factorial\_behv}はそれぞれ継続を保持するアクター、継続アクターを作っていくアクターの振る舞いである。
+Actario では \texttt{receive} を使って振る舞いを作る。
+\texttt{receive} の引数には \texttt{message} 型から \texttt{actions} 型の関数が与えられる。
+\texttt{factorial\_cont\_behv}, \texttt{factorial\_behv} ではパターンマッチをした後の部分が Actario 独自の記法となっており、このアクターが行うアクションの列を表している。
+\texttt{factorial\_system} はこのシステムを起動する関数である。
+階乗を計算したい数、結果を送るアクターの名前を引数にとり、システムを実行する。
 
-\subsection{Actor Name}
-アクターの名前は、親がいないアクターと何らかのアクターから生成されたアクターに分けて定義する。
-親がいないアクターは toplevel actor と呼ぶ。
-これはアクターシステムに最初から存在するアクターを表す。
-何らかのアクターから生成されたアクターを generated actor と呼ぶ。
-generated actor の名前は、親アクターの名前と、その親アクターが何番目に生成した子かという番号 (generation number) のペアとする。
-これは動的に生成されうるアクターの名前の一意性を保つためである。
-基本的に Actario のプログラマは自分で名前を構築するようなことはしない。
-
-\begin{lstlisting}
-Inductive name : Set :=
-| toplevel : string -> name
-| generated : nat -> name -> name.
-\end{lstlisting}
+これ以降では Actario を用いたプログラミングに必要な型や記法について説明する。
 
 \subsection{message}
-アクター間で取り交わされるメッセージの型を定義する。
-Coq 内でメッセージを扱うため、Coq の型として定義する。
-また、任意の型の値をメッセージとすることはできない。
-これは、
-1. これを導入すると name, 後述する actor, actions, behavior にメッセージの型パラメータを付与しなければいけなくなり、この後の証明が煩雑になる
-2. ターゲットとして Erlang を想定しているので、Erlang のプリミティブをサポートするくらいでいい
-3. この定義で十分
-のためである。(理由が弱い)
+アクター間で取り交わされるメッセージの型 \texttt{message} は図\ref{coq:message}と定義されている。
+空のメッセージ、アクターの名前のメッセージ、基本的な型 (自然数、文字列、ブール値) のメッセージ、タプルのメッセージを扱うことができる。
 
-\begin{lstlisting}
-Inductive message : Set :=
-| empty_msg : message
-| name_msg : name -> message
-| str_msg : string -> message
-| nat_msg : nat -> message
-| bool_msg : bool -> message
-| tuple_msg : message -> message -> message.
-\end{lstlisting}
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Inductive message : Set :=
+    | empty_msg : message
+    | name_msg : name -> message
+    | str_msg : string -> message
+    | nat_msg : nat -> message
+    | bool_msg : bool -> message
+    | tuple_msg : message -> message -> message.
+  \end{lstlisting}
+  \caption{message type}\label{coq:message}
+\end{figure}
+
 
 \subsection{actions, behavior}
-\texttt{actions} はアクターが行うアクションの列である。new, send, self, become がある。
-behavior is a function from message to actions.
+\texttt{actions} はアクターが行うアクションの列を表す型である。
+アクションの種類は、他のアクターに向けてメッセージを送る\texttt{send}、新しいアクターを作る\texttt{new}、自分自身の名前を得る\texttt{self}、次のメッセージに対する振る舞いを決める\texttt{become}があり、これらが \texttt{actions} の値コンストラクタとなっている。
+behavior is defined as a function from message to actions.
 
-\begin{lstlisting}
-CoInductive actions : Type :=
-| new : behavior -> (name -> actions) -> actions
-| send : name -> message -> actions -> actions
-| self : (name -> actions) -> actions
-| become : behavior -> actions
-with behavior : Type :=
-| receive : (message -> actions) -> behavior.
-\end{lstlisting}
+\begin{figure}[tb]
+  \begin{lstlisting}
+    CoInductive actions : Type :=
+    | new : behavior -> (name -> actions) -> actions
+    | send : name -> message -> actions -> actions
+    | self : (name -> actions) -> actions
+    | become : behavior -> actions
+    with behavior : Type :=
+    | receive : (message -> actions) -> behavior.
+  \end{lstlisting}
+  \caption{actions and behavior type}\label{coq:actions}
+\end{figure}
 
-actions のそれぞれのコンストラクタを説明する。
-\texttt{new : behavior -> (name -> actions) -> actions} は、新しいアクターを生成するアクションである。
-引数として与えられたある behavior を initial behavior として新しいアクターを生成し、その名前をアクションの継続に渡す。
-\texttt{send : name -> message -> actions -> actions} は、指定した名前のアクターにメッセージを送るアクションである。
-第一引数に指定した名前のアクターに、第二引数で指定したメッセージを送り、第三引数で指定したその後のアクションを実行する、という意味である。
-\texttt{self : (name -> actions) -> actions} は自分自身の名前を得るアクションである。
-自分の名前を第一引数で与えられた継続に渡し、残りのアクションを得る。
-\texttt{become : behavior -> actions} は次のメッセージに対して指定した振る舞いで処理する。
-また、次のメッセージの待ち状態になることも表し、これ以降アクションは取れないようになっている。
+\texttt{actions} および \texttt{behavior} は Actario では図\ref{coq:actions} のように定義されている。
+\texttt{actions} のそれぞれのコンストラクタを説明する。
+\begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
+\item[\texttt{new : behavior -> (name -> actions) -> actions}]
+  新しいアクターを生成するアクションである。
+  引数として与えられたある behavior を initial behavior として新しいアクターを生成し、その名前をアクションの継続に渡す。
+\item[\texttt{send : name -> message -> actions -> actions}]
+  指定した名前のアクターにメッセージを送るアクションである。
+  第一引数に指定した名前のアクターに、第二引数で指定したメッセージを送り、第三引数で指定したその後のアクションを実行する、という意味である。
+\item[\texttt{self : (name -> actions) -> actions}]
+  自分自身の名前を得るアクションである。
+  自分の名前を第一引数で与えられた継続に渡し、残りのアクションを得る。
+\item[\texttt{become : behavior -> actions}]
+  次のメッセージに対して指定した振る舞いで処理する。
+  また、次のメッセージの待ち状態になることも表し、これ以降アクションは取れないようになっている。
+\end{description}
 
 actions と behavior は co-inductive types として定義される。
 これは become で現在の behavior を指定したり、ある他の behavior と相互再帰するようなことがあるからである。
 Coq ではこのような、コンストラクタの深さが小さくならない再帰は通常の inductive definition では書けなくなっている。
 
-また、以下のように notation をつけている。
-
-\begin{lstlisting}
-Notation ``n '<-' 'new' behv ; cont'' := (new behv (fun n => cont)) (at level 0, cont at level 10).
-Notation ``n '!' m ';' a'' := (send n m a) (at level 0, a at level 10).
-Notation ``me '<-' 'self' ';' cont'' := (self (fun me => cont)) (at level 0, cont at level 10).
-\end{lstlisting}
-
+また、アクターモデルを採用しているプログラミング言語に近づけるように図\ref{coq:notation}のような notation をつけている。
 \texttt{n <- new behv; cont} は \texttt{new behv (fun n => cont)} に変換され、
 \texttt{n ! msg; cont} は \texttt{send n msg cont} に変換され、
 \texttt{me <- self; cont} は \texttt{self (fun me => cont)} に変換される。
 
-\subsection{actor}
-アクターは、自分自身名前、残りのアクションの列、次回アクターを生成する際に使う generation number の3つのレコード型である。
-残りのアクションの列が become のみの場合、このアクターはメッセージを受け取れる状態にあるということを表す。
-
-\begin{lstlisting}
-Record actor := {
-  actor_name : name;
-  remaining_actions : actions;
-  next_num : gen_number
-}.
-\end{lstlisting}
-
-\subsection{in flight message}
-宛先と送り主とメッセージの内容からなるレコード型である。
-まだ受け取られていないメッセージを表す。
-configuration に用いる。
-
-\begin{lstlisting}
-Record in_flight_message := {
-  to : name;
-  from : name;
-  content : message
-}.
-\end{lstlisting}
-
-\subsection{configuration}
-configuration はアクターシステムの現在のスナップショットを表す。
-configuration はアクターモデルの意味論を定義する際に用いるものである。
-Actario では configuration を actor の列と in\_flight\_message の列のペアとして定義する。
-
-\begin{lstlisting}
-Record config := {
-  in_flight_messages : seq in_flight_message;
-  actors : seq actor
-}.
-\end{lstlisting}
-
-\footnote{seq は ssreflect で定義されているもので、Coq の list の notation。}
-
-\subsection{Example: factorial system}
-例として階乗を計算するアクターシステムを定義する。
-このシステムは、与えられた自然数 n に対して、n の階乗を計算した結果を、与えられた名前のアクターに対して送信するシステムである。
-次に何をかけるかという情報を持った (continuation を持った) アクターを作るシステムになっている。\ref{agha:2004}
-
-\begin{lstlisting}
-CoFixpoint factorial_cont_behv (val : nat) (cust : name) : behavior :=
-  receive (fun msg =>
-         match msg with
-           | nat_msg arg =>
-             cust ! nat_msg (val * arg);
-             become empty_behv
-           | _ => become (factorial_cont_behv val cust)
-         end).
-
-CoFixpoint factorial_behv : behavior :=
-  receive (fun msg =>
-         match msg with
-           | tuple_msg (nat_msg 0) (name_msg cust) =>
-             cust ! nat_msg 1;
-             become factorial_behv
-           | tuple_msg (nat_msg (S n)) (name_msg cust) =>
-             cont <- new (factorial_cont_behv (S n) cust);
-             me <- self;
-             me ! tuple_msg (nat_msg n) (name_msg cont);
-             become factorial_behv
-           | _ => become factorial_behv
-         end).
-
-Definition factorial_system (n : nat) (parent : name) : config :=
-  init "factorial" (
-         x <- new factorial_behv;
-         x ! tuple_msg (nat_msg n) (name_msg parent);
-         become empty_behv
-       ).
-\end{lstlisting}
-
-まず、\texttt{factorial\_cont\_behv} と \texttt{factorial\_behv} を定義している。
-これはそれぞれ何をかければいいかという自然数を保持するアクターと、それを作るアクターの振る舞いになっている。
-The reason why these are defined using \texttt{CoFixpoint} is to define recursive function with no decreasing.
-Coq's \texttt{Fixpoint}, used in definition of recursive function, imposes decreasing of size of argument so we cannot use \texttt{Fixpoint}.
-次に \texttt{factorial\_system} という関数を定義している。
-これはシステムを走らせるための関数になっている。
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Notation ``n '<-' 'new' behv ; cont'' := (new behv (fun n => cont)) (at level 0, cont at level 10).
+    Notation ``n '!' m ';' a'' := (send n m a) (at level 0, a at level 10).
+    Notation ``me '<-' 'self' ';' cont'' := (self (fun me => cont)) (at level 0, cont at level 10).
+  \end{lstlisting}
+  \caption{notation for actions}\label{coq:notation}
+\end{figure}

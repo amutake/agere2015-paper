@@ -52,3 +52,8 @@ behvA() ->
       behvA()
   end.
 \end{lstlisting}
+
+\subsubsection{Name}
+名前はプログラマが自分でコンストラクタから作るということはしないので、すべてが変数に格納されている。
+なので Erlang に変換すると変数になっている。
+Actario で書いたプログラムの name 型の変数には Actario での name 型の値に束縛されているが、Erlang に変換したあとのプログラムの対応する変数は Erlang のプロセスIDに束縛されている。

@@ -1,10 +1,111 @@
 \section{semantics}
+\label{sec:semantics}
 
-Actario では
+本節では Actario が定義しているアクターモデルの操作的意味論について説明する。
+まず意味論の説明に必要な \texttt{name} 型、\texttt{actor} 型、\texttt{in\_flight\_message} 型、\texttt{config} 型について説明し、
+操作的意味について説明する。
 
-以下のように定義する。
+\subsection{Actor Name}
+Actario ではアクターの名前は、親がいないアクターと何らかのアクターから生成されたアクターに分けて定義する (図\ref{coq:name})。
+親がいないアクターは toplevel actor と呼ぶ。
+これはアクターシステムに最初から存在するアクターを表す。
+何らかのアクターから生成されたアクターを generated actor と呼ぶ。
+generated actor の名前は、親アクターの名前と、その親アクターが何番目に生成した子かという番号 (generation number) のペアとする。
+これは動的に生成されうるアクターの名前の一意性を保つためである。
 
-\begin{figure}[t]
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Inductive name : Set :=
+    | toplevel : string -> name
+    | generated : nat -> name -> name.
+  \end{lstlisting}
+  \caption{name}\label{coq:name}
+\end{figure}
+
+
+\subsection{actor}
+アクターは、自分自身名前、残りのアクションの列、次回アクターを生成する際に使う generation number の3つのレコード型である (図\ref{coq:actor})。
+残りのアクションの列が become のみの場合、このアクターはメッセージを受け取れる状態にあるということを表す。
+
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Record actor := {
+      actor_name : name;
+      remaining_actions : actions;
+      next_num : gen_number
+    }.
+  \end{lstlisting}
+  \caption{actor}\label{coq:actor}
+\end{figure}
+
+\subsection{in flight message}
+宛先と送り主とメッセージの内容からなるレコード型である (図\ref{coq:inflight}))。
+まだ受け取られていないメッセージを表す。
+configuration に用いる。
+
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Record in_flight_message := {
+      to : name;
+      from : name;
+      content : message
+    }.
+  \end{lstlisting}
+  \caption{in flight message}\label{coq:inflight}
+\end{figure}
+
+\subsection{configuration}
+configuration はアクターシステムの現在のスナップショットを表す。
+configuration はアクターモデルの意味論を定義する際に用いるものである。
+Actario では configuration を actor の列と in\_flight\_message の列のペアとして定義する
+\footnote{seq は ssreflect で定義されているもので、Coq の list の notation。}。
+
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Record config := {
+      in_flight_messages : seq in_flight_message;
+      actors : seq actor
+    }.
+  \end{lstlisting}
+  \caption{config}\label{coq:config}
+\end{figure}
+
+
+\subsection{label}
+
+Actario ではアクターモデルの操作的意味を labeled transition system として定式化するため、ラベルを定義する (図\ref{coq:label}))。
+以下にそれぞれの説明を示す。
+
+\begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
+\item[\texttt{Receive (to : name) (from : name) (content : message)}]
+  \texttt{to} という名前のアクターが \texttt{from} という名前のアクターからのメッセージ \texttt{content} を受け取って遷移したということを表す。
+\item[\texttt{Send (from : name) (to : name) (content : message)}]
+  \texttt{from} という名前のアクターが \texttt{to} という名前のアクターに向けてメッセージ \texttt{content} を送ってシステムが遷移したということを表す。
+\item[\texttt{New (child : name)}]
+  \texttt{child} という名前の新しいアクターが生成されてシステムが遷移したということを表す。
+\item[\texttt{Self (me : name)}]
+  \texttt{me} という名前のアクターが自分自身の名前を読みだしたということを表す。
+\end{description}
+
+
+\begin{figure}[tb]
+  \begin{lstlisting}
+    Inductive label :=
+    | Receive (to : name) (from : name) (content : message) (* `to` receives a message `content` from `from` *)
+    | Send (from : name) (to : name) (content : message)    (* `from` sends a message `content` to `to` *)
+    | New (child : name)                                    (* an actor named `child` is created *)
+    | Self (me : name).                                     (* `me` gets own name *)
+  \end{lstlisting}
+  \caption{label}\label{coq:label}
+\end{figure}
+
+
+\subsection{semantics}
+
+アクターモデルの操作的意味を configuration のラベル付き遷移システムとして定式化する。
+これ以降用いる記号を図\ref{fig:config}のように定義する。
+
+\begin{figure}[tb]
   \begin{displaymath}
     \begin{array}{rclcl}
       c & \in & \textit{Configuration} & =   & \textit{InFlight} \times \textit{Actor} \\
@@ -18,6 +119,10 @@ Actario では
         &     &                 &   | & \textsf{new}(b, \kappa) \\
         &     &                 &   | & \textsf{self}(\kappa) \\
         &     &                 &   | & \textsf{become}(b) \\
+      l & \in & \textit{Label}  & ::= & \textsf{Receive}(n, n, m) \\
+        &     &                 &   | & \textsf{Send}(n, n, m) \\
+        &     &                 &   | & \textsf{New}(n) \\
+        &     &                 &   | & \textsf{Self}(n) \\
       \kappa & \in & \textit{Name} \rightarrow \textit{Actions} & & \\
       g & \in & \mathbb{N} & &
     \end{array}
@@ -25,49 +130,34 @@ Actario では
   \caption{Configuration}\label{fig:config}
 \end{figure}
 
-操作的意味論を labeled transition system として形式化する。
-ラベルとして receive, send, new, self の4つを用意する。
-
-\begin{lstlisting}
-  Inductive label :=
-  | Receive (to : name) (from : name) (content : message) (* `to` receives a message `content` from `from` *)
-  | Send (from : name) (to : name) (content : message)    (* `from` sends a message `content` to `to` *)
-  | New (child : name)                                    (* an actor named `child` is created *)
-  | Self (me : name).                                     (* `me` gets own name *)
-\end{lstlisting}
-
-\texttt{Receive (to : name) (from : name) (content : message)} は to という名前のアクターが from という名前のアクターからのメッセージ content を受け取ったということを表す。
-\texttt{Send (from : name) (to : name) (content : message)} は from という名前のアクターが to という名前のアクターに向けてメッセージ content を送ったということを表す。
-\texttt{New (child : name)} は child という名前の新しいアクターを生成したということを表し、
-\texttt{Self (me : name)} は me という名前のアクターが自分自身の名前を読みだしたということを表す。
 
 このラベル一つ一つに対応した意味論は図\ref{semantics}にある。
 receive はメッセージ待ち状態にあるアクターが、自身に向けて送られたメッセージを受け取り、アクションの列を生成する遷移である。
 send はあるアクターが他のアクターに向けてメッセージを送る遷移。
 ...
-これを Coq 上で定義すると図\ref{coq:semantics}のようになる。ほとんどそのままだが集合の代わりにリストを使っている。なぜならば...
+Actario での定義は Appendix \ref{app:lts} にある。
 
 \begin{figure*}[t]
   \begin{displaymath}
     \begin{array}{rcll}
       (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{to}}, \textsf{become}(b), g)\}) &
-      \overset{\textsf{receive}(n_{\textrm{to}}, n_{\textrm{from}}, m)}{\leadsto} &
+      \overset{\textsf{Receive}(n_{\textrm{to}}, n_{\textrm{from}}, m)}{\leadsto} &
       (I, A \cup \{(n_{\textrm{to}}, b(m), g)\}) &
-      \textsc{(Receive)} \\
+      \textsc{(Receive)} \\[1ex]
 
       (I, A \cup \{(n_{\textrm{from}}, \textsf{send}(n_{\textrm{to}}, m, \alpha), g)\}) &
-      \overset{\textsf{send}(n_{\textrm{from}}, n_{\textrm{to}}, m)}{\leadsto} &
+      \overset{\textsf{Send}(n_{\textrm{from}}, n_{\textrm{to}}, m)}{\leadsto} &
       (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{from}}, \alpha, g)\}) &
-      \textsc{(Send)} \\
+      \textsc{(Send)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{new}(b, \kappa), g)\}) &
-      \overset{\textsf{new}(n')}{\leadsto} &
+      \overset{\textsf{New}(n')}{\leadsto} &
       (I, A \cup \{(n, \kappa(n'), g + 1), (n', \textsf{become}(b), 0)\}) & \\
       & & \hfill \textrm{where}\ n' := \textsf{generated}(g, n) &
-      \textsc{(New)} \\
+      \textsc{(New)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{self}(\kappa), g)\}) &
-      \overset{\textsf{self}(n)}{\leadsto} &
+      \overset{\textsf{Self}(n)}{\leadsto} &
       (I, A \cup \{n, \kappa(n), g\}) &
       \textsc{(Self)}
     \end{array}
