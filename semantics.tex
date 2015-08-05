@@ -90,11 +90,11 @@ Actario ではアクターモデルの操作的意味を labeled transition syst
 
 \begin{figure}[tb]
   \begin{lstlisting}
-    Inductive label :=
-    | Receive (to : name) (from : name) (content : message) (* `to` receives a message `content` from `from` *)
-    | Send (from : name) (to : name) (content : message)    (* `from` sends a message `content` to `to` *)
-    | New (child : name)                                    (* an actor named `child` is created *)
-    | Self (me : name).                                     (* `me` gets own name *)
+Inductive label :=
+| Receive (to : name) (from : name) (content : message)
+| Send (from : name) (to : name) (content : message)
+| New (child : name)
+| Self (me : name).
   \end{lstlisting}
   \caption{label}\label{coq:label}
 \end{figure}
@@ -108,7 +108,7 @@ Actario ではアクターモデルの操作的意味を labeled transition syst
 \begin{figure}[tb]
   \begin{displaymath}
     \begin{array}{rclcl}
-      c & \in & \textit{Configuration} & =   & \textit{InFlight} \times \textit{Actor} \\
+      c & \in & \textit{Configuration} & =   & \textit{Set(InFlight)} \times \textit{Set(Actor)} \\
       a & \in & \textit{Actor}  & =   & \textit{Name} \times \textit{Actions} \times \mathbb{N} \\
       n & \in & \textit{Name}   & ::= & \textsf{toplevel}(s) \mid \textsf{generated}(g, n) \\
       m & \in & \textit{Message} & =  & \textit{Name} + \textit{PrimVal} + \\
