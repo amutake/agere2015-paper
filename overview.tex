@@ -1,17 +1,23 @@
 \section{Overview of Actario}
 \label{sec:overview}
 
-Actario はアクターモデルを使ったアプリケーションのフレームワーク。
-Actario を使ったアプリケーションの構築は以下のような流れになる。
-
+Actario is a Coq framework for defining and verifying actor-based
+systems. A typical workflow using Actario is as follows.
 \begin{enumerate}
-\item Actario の提供するシンタックスを使ってプログラミングする
-\item プログラムの性質の検証
-\item Erlang へ変換して実行
+\item Describe an actor-based system using types and notations defined in the framework.
+\item Verify desired properties of the system in Coq.
+\item Extract the Erlang version of the system using the code extraction mechanism of Coq.
 \end{enumerate}
 
-現在 Actario を使ったプログラムの検証は、検証するための道具が少なく、難しくなっている。
-けれども Actario が提供する構文と意味論は、name uniqueness, actor persistence, message persistence というアクターモデルの性質を満たすことが証明されている。
+Actario is currently under development and still does not provide
+convenient libraries of predicates, lemmas, tactics and so
+forth. Thus, verifying a user-defined actor system may involve a large
+amount of work. However, we have formally proved that the underlying
+execution model provided in the framework satisfies three important
+actor properties: name uniqueness, actor persistence and name
+persistence. The fact implies that a system described using Actario is
+guaranteed to have these actor properties.
+
 
 \subsection{Example: factorial system}
 まず Actario を使った例として、階乗を計算するアクターシステムを説明する。
