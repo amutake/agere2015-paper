@@ -1,12 +1,12 @@
 .PHONY: pdf cont clean update
 
-MAIN=sig-alternate.tex
+MAIN=sig-alternate
 TEXINPUTS=".:./sty//:"
 
-pdf: sig-alternate.tex
+pdf: $(MAIN).tex
 	TEXINPUTS=$(TEXINPUTS) latexmk -pdf $(MAIN)
 
-cont: sig-alternate.tex
+cont: $(MAIN).tex
 	TEXINPUTS=$(TEXINPUTS) latexmk -pvc -pdf $(MAIN)
 
 clean:
