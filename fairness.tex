@@ -1,25 +1,28 @@
 \section{Fairness}
 
-fairness property とは、あるメッセージの受け取りが無限に遅延されることはないという性質である。
-一般的に fairness は weak fairness と strong fairness がある。
-weak fairness は、これから先常にあるアクターがあるメッセージを受け取れる状態にあるならば、そのメッセージはいつか受け取られる、という性質である。
-strong fairness は、これから先、あるアクターがあるメッセージを無限にしばしば受け取れる状態になるならば、そのメッセージはいつか受け取られる、という性質である。
-この論文では strong fairness を定義する。
-
-fairness は一般的には時相論理のオペレータを使って表されるが、Coq では時相論理のオペレータは備えていないので、エンコードする必要がある。
-そこで、我々は configuration の列を表す transition path を使って、transition path の述語として fairness を表現することにする。
-この方法は \ref{applpi} で用いられている方法と全く同じである。
+\textsf{fairness} is a property that reception of a message does not delay infinitely.
+There are two variants of fairness property, weak fairness and strong fairness.
+Weak fairness is that if an actor is infinitely always ready to receive the message, the message is eventually received.
+Strong fairness is that if an actor is infinitely often ready to receive the message, the message is eventually received.
+The Actor model satisfies strong fairness.
+In this section, we define strong fairness in Actario.
 
 \subsection{Transition Path}
-transition path は自然数から option config への関数とし、Coq では以下のように定義する。
-ここでの自然数は initial configuration から何回遷移をしたあとの configuration かを表す index であり、option である理由はこれ以上遷移できないこともあるからである。
-つまり、i 番目の configuration から遷移先がない場合は、i + 1 番目以降は None になる。
+Generally, fairness is represented in using operators of temporal logic.
+We have to encode temporal logic because Coq does not support temporal logic.
+We use transition path, which represents transition sequence of configuration, to define fairness as predicate of transition path.
+This method is used in Appl$\pi$ \cite{Affeldt200817}.
+
+We define transition path as function of $\mathbb{N}$ to \texttt{option config}.
+In this definition, $\mathbb{N}$ represents the number of transitions from initial configuration and the reason why return value is wrapped with \texttt{option} is that it may be no more transitions.
+% つまり、i 番目の configuration から遷移先がない場合は、i + 1 番目以降は None になる。
 
 \begin{lstlisting}
 Definition path := nat -> option config.
 \end{lstlisting}
 
-また、与えられた transition path が確かに transition path になっているか、という述語を定義する。すべての index n について、n 番目の configuration が存在するならば、n + 1 番目の configuration が存在するならそれは遷移できるものか、それ以上遷移できない。n 番目の configuration が存在しないならば、その次の configuration も存在しない、という意味である。
+And we define the predicate that the given path is correct transition path.
+%% また、与えられた transition path が確かに transition path になっているか、という述語を定義する。すべての index n について、n 番目の configuration が存在するならば、n + 1 番目の configuration が存在するならそれは遷移できるものか、それ以上遷移できない。n 番目の configuration が存在しないならば、その次の configuration も存在しない、という意味である。
 
 \begin{lstlisting}
 Definition is_transition_path (p : path) : Prop :=
@@ -31,8 +34,10 @@ Definition is_transition_path (p : path) : Prop :=
 \end{lstlisting}
 
 \subsection{enabled}
-
-ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
+We define the predicate that the transition from the given configuration with the given label is possible, called \texttt{enabled}.
+\texttt{enabled} is defined as there exists a configuration after transition from the configuration with the label.
+In Actario, \texttt{enabled} is defined as follows.
+%% ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
 
 \begin{lstlisting}
 Definition enabled (c : config) (l : label) : Prop :=
@@ -40,8 +45,8 @@ Definition enabled (c : config) (l : label) : Prop :=
 \end{lstlisting}
 
 \subsection{infinitely often enabled}
-無限にしばしば enabled になるという述語を定義する。
-これは、すべての index n について、n 番目の configuration があるラベルによって遷移が可能ならば、その先そのラベルによって遷移が可能になる configuration が存在する、と定義する。
+We define the predicate that the transition is infinitely often enabled in the transition path.
+%% これは、すべての index n について、n 番目の configuration があるラベルによって遷移が可能ならば、その先そのラベルによって遷移が可能になる configuration が存在する、と定義する。
 
 \begin{lstlisting}
 Definition infinitely_often_enabled (l : label) (p : path) : Prop :=
@@ -54,7 +59,9 @@ Definition infinitely_often_enabled (l : label) (p : path) : Prop :=
 
 
 \subsection{eventually processed}
-また、いつか実際にあるラベルでもって遷移するということを表す述語 eventually\_processed を定義する。
+We define \texttt{eventually processed} that is the predicate of label and transition path.
+It represents that the transition with the label is processed eventually in the path.
+It is defined as follows.
 
 \begin{lstlisting}
 Definition eventually_processed (l : label) (p : path) : Prop :=
@@ -64,6 +71,11 @@ Definition eventually_processed (l : label) (p : path) : Prop :=
 
 
 \subsection{Definition of fairness}
+Then we can define \texttt{fairness} predicate for transition path.
+For the given transition path and for each label, if \texttt{infinitely often enabled} holds, then \texttt{eventually processed} holds.
+\texttt{is postfix of} predicate is used for representing 'infinite'.
+If \texttt{is postfix of} is not used, the transition may not be processed after the transition is processed although the transition is processed in whole the path.
+To prevent it, if \texttt{inifinitely often enabled} holds then \texttt{eventually processed} holds for arbitrary postfix path by using \texttt{is postfix path}.
 
 \begin{lstlisting}
 Definition is_postfix_of (p' p : path) : Prop :=
@@ -75,6 +87,3 @@ Definition fairness : Prop :=
                   infinitely_often_enabled l p' ->
                   eventually_processed l p').
 \end{lstlisting}
-
-
-is\_postfix\_of がない場合は、そのパス全体では実際に遷移を実行してもその後のパスでは遷移を実行しないということがありうる。これを防ぐために is\_postfix\_of を使って、任意の postfix path について infinitely often enabled ならば eventually processed が成り立つとしている。
