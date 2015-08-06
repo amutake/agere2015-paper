@@ -67,12 +67,16 @@
 \usepackage{luatexja-fontspec}
 
 \lstdefinestyle{default}{
+  language=coq,
+  basicstyle={\ttfamily\normalsize},
   breaklines=true,
-  basicstyle=\ttfamily\normalsize,
   frame=tb,
   framesep=6pt,
-  captionpos=b,
-  language=coq
+  captionpos=b
+}
+\lstdefinestyle{small}{
+  style=default,
+  basicstyle={\ttfamily\small},
 }
 \lstset{
   style=default
