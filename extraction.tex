@@ -5,6 +5,8 @@ If we want to extract to other languages or use custom extraction algorithm, we 
 Actario has custom extraction mechanism for the programs using Actario.
 It can extract to Erlang.
 It is not proven that the extraction mechanism does not change the meanings of Actario programs and Erlang programs.
+In Actario, \lstinline|ActorExtraction| command is defined for extracting actor systems.
+It is used like traditional \lstinline|Extraction| command.
 
 \subsection{Data Types}
 
@@ -48,7 +50,7 @@ CoFixpoint behvA :=
 
 以下のように抽出されるようにする。
 
-\begin{lstlisting}
+\begin{lstlisting}[language=erlang]
 behvA() ->
   receive Msg -> case Msg of
     {name_msg, Sender} ->
@@ -62,7 +64,56 @@ behvA() ->
   end.
 \end{lstlisting}
 
-\subsubsection{Name}
+\subsection{Name}
 名前はプログラマが自分でコンストラクタから作るということはしないので、すべてが変数に格納されている。
 なので Erlang に変換すると変数になっている。
 Actario で書いたプログラムの name 型の変数には Actario での name 型の値に束縛されているが、Erlang に変換したあとのプログラムの対応する変数は Erlang のプロセスIDに束縛されている。
+
+\subsection{Execution}
+The program extracted by Actario is impossible to execute by itself.
+So Actario's programmers have to write executor to execute the extracted Actor system in Erlang.
+For example, we consider factorial system described in section \ref{sec:overview}.
+
+\begin{lstlisting}
+Definition factorial_system (n : nat) (parent : name) : config :=
+  init "factorial" (
+         x <- new factorial_behv;
+         x ! tuple_msg (nat_msg n) (name_msg parent);
+         become empty_behv
+       ).
+\end{lstlisting}
+
+\lstinline|factorial_system| is extracted to the following Erlang code.
+
+\begin{lstlisting}[language=erlang]
+factorial_system(N, Parent) ->
+    X = spawn(fun() ->
+        factorial_behv()
+    end),
+    X ! {tuple_msg, {nat_msg, N}, {name_msg, Parent}},
+    empty_behv().
+\end{lstlisting}
+
+To execute this, we have to write executor like the following.
+\lstinline[language=erlang]|nat2int| and \lstinline[language=erlang]|int2nat| are auxiliary functions for converting Coq's natural number and Erlang's integer.
+
+\begin{lstlisting}[language=erlang]
+-module(fact_main).
+-export([fact/1]).
+
+fact(N) ->
+    _ = spawn(factorial, factorial_system, [int2nat(N), self()]),
+    receive
+        {nat_msg, Result} ->
+            io:fwrite("fact(~w) = ~w~n", [N, nat2int(Result)]);
+        _ ->
+            io:fwrite("error~n")
+    end.
+
+nat2int({o}) -> 0;
+nat2int({s, N}) -> nat2int(N) + 1.
+
+int2nat(0) -> {o};
+int2nat(N) when N > 0 -> {s, int2nat(N - 1)};
+int2nat(_) -> {o}.
+\end{lstlisting}
