@@ -10,11 +10,11 @@ In this section, we define strong fairness in Actario.
 \subsection{Transition Path}
 Generally, fairness is represented in using operators of temporal logic.
 We have to encode temporal logic because Coq does not support temporal logic.
-We use transition path, which represents transition sequence of configuration, to define fairness as predicate of transition path.
+We use transition path, which represents transition sequence of configuration, to define fairness as a predicate of transition path.
 This method is used in Appl$\pi$ \cite{Affeldt200817}.
 
-We define transition path as function of $\mathbb{N}$ to \texttt{option config}.
-In this definition, $\mathbb{N}$ represents the number of transitions from initial configuration and the reason why return value is wrapped with \texttt{option} is that it may be no more transitions.
+We define transition path as a function of $\mathbb{N}$ to \texttt{option config}.
+In this definition, $\mathbb{N}$ represents the number of transitions from initial configuration and the reason why the return value is wrapped with \texttt{option} is that it may be no more transitions.
 % つまり、i 番目の configuration から遷移先がない場合は、i + 1 番目以降は None になる。
 
 \begin{lstlisting}
@@ -35,7 +35,7 @@ Definition is_transition_path (p : path) : Prop :=
 
 \subsection{enabled}
 We define the predicate that the transition from the given configuration with the given label is possible, called \texttt{enabled}.
-\texttt{enabled} is defined as there exists a configuration after transition from the configuration with the label.
+\texttt{enabled} is defined as there exists a configuration after transitioning from the configuration with the label.
 In Actario, \texttt{enabled} is defined as follows.
 %% ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
 
