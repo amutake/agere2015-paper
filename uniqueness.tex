@@ -1,16 +1,17 @@
 \section{Name Uniqueness}
 \label{sec:uniqueness}
+\note{なぜこれが証明されていなければいけないのか、これが証明されていることによってどういうことが言えるのか}
 In programming languages or libraries providing the Actor model such as Erlang or Akka,
-the system automatically generate actor with fresh name without specifying name by programmer explicitly .
-In Actario, the proposition that all actor names in configuration are not duplicate by any transitions is proven.
+the system automatically generates actors with fresh names without specifying the name explicitly by programmer.
+In Actario, the proposition that all actor names in the configuration are not duplicate by any transitions is proven.
 
-アクターモデルを提供する言語やライブラリ、例えば Erlang や Akka では、アクターを生成する際にプログラマが名前を指定せずとも fresh な名前を生成してくれる。
-また、アクターはシステムの進行中に動的に生成されうるものなので、動的に生成されうるアクターの名前が常に一意になることが重要である。
-Actario では、Actario の意味論において、ある制限を満たした初期状態からの任意の遷移でアクターの名前が衝突しないことを証明した。
+%% アクターモデルを提供する言語やライブラリ、例えば Erlang や Akka では、アクターを生成する際にプログラマが名前を指定せずとも fresh な名前を生成してくれる。
+%% また、アクターはシステムの進行中に動的に生成されうるものなので、動的に生成されうるアクターの名前が常に一意になることが重要である。
+%% Actario では、Actario の意味論において、ある制限を満たした初期状態からの任意の遷移でアクターの名前が衝突しないことを証明した。
 
-We define invariant between any transition
-システムの遷移において満たされる、名前についての性質 trans invariant を定義し、trans invariant が確かに遷移の間で保存されることを証明、そして trans invariant が成り立てば名前の一意性が成り立つことの証明、初期状態が
-The invariant consists of the following three predicates for configuration.
+To prove, we define an invariant about actor names preserved between any transitions. It is named \textit{trans invariant}.
+The trans invariant consists of the following three predicates for configuration.
+%% システムの遷移において満たされる、名前についての性質 trans invariant を定義し、trans invariant が確かに遷移の間で保存されることを証明、そして trans invariant が成り立てば名前の一意性が成り立つことの証明、初期状態が
 
 \begin{displaymath}
   \begin{array}{l}
@@ -18,6 +19,8 @@ The invariant consists of the following three predicates for configuration.
     \quad \texttt{chain}(c) \wedge \texttt{gen\_fresh}(c) \wedge \texttt{no\_dup}(c)
   \end{array}
 \end{displaymath}
+
+The brief explanations of \texttt{chain}, \texttt{gen\_fresh}, and \texttt{no\_dup} are followings:
 
 \begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
 \item[\texttt{chain}]
@@ -30,7 +33,7 @@ The invariant consists of the following three predicates for configuration.
 
 \subsection{functions}
 
-Before starting explanation, we define some functions used in this section.
+Before starting the explanation and the proof, we define some functions used in this section.
 
 \begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
 \item[\texttt{actors} $: \textit{Configuration} \rightarrow \textit{Set(Actor)}$]
@@ -61,10 +64,10 @@ We define an predicate of configuration, called \texttt{chain}.
   \end{array}
 \end{displaymath}
 
-Then, we can prove chain perservation property that chain is perserved between any transition.
+Then, we can prove \textit{chain perservation property} that chain is perserved between any transitions.
 The proof is by case analysis on the label.
-\textsf{New} transition is The change of the number of actors and next generation number in the configuration is only. %% New transition だけ考えれば良い
-so we ? only \textsf{New} transition
+\texttt{chain} is decided by only actor names, and the transition which have possibility to change the names in the configuration is only \textsc{New} transition.
+Therefore, we consider only the case of \textsc{New} transition.
 
 \begin{lemma}{chain preservation}
 \begin{displaymath}
@@ -89,14 +92,19 @@ We translate the proposition that next generated name is fresh to the following.
 \end{displaymath}
 
 
-For each actor in the configuration, if
+It is guaranteed that the actor name generated in the next is fresh if satisfying \texttt{gen\_fresh} predicate by the relation of next generation numbers and actor names. %% For each actor in the configuration, if its parent is in the configuration, the next generation number of the parent actor is greater than the generation number of the name of the child actor.
+However, the actor name generated after the next is not always fresh name.
+For example, if there are two actors ($A$ and $B$) that have the same name and the same next generation number and actor $A$ generates a child actor and actor $B$ generates a child actor, although \texttt{gen\_fresh} holds, these child actors have the same name.
+And, if the parent of the actor $A$ does not exist in the configuration and the parent of the parent exists in the configuration, and the parent of the parent actor generates an actor and it also generates an actor, then the name is possible to have the same as $A$'s one.
 
-つまり、あるアクターについて、システム内に親アクターがいる場合、親アクターが次に生成する番号は自分の番号よりも大きい、ということにより、次に生成するアクターの名前が被らないようになっている。
-ただし、次に生成するアクターの名前は fresh でもその次に生成するアクターは fresh ではないこともある。
-例えば、同じ名前でかつ次の generation number も同じという2つのアクターがいた場合、まず片方のアクターが生成するアクターの名前は fresh だが、その次にもう片方のアクターがアクターを生成したとすると、名前が被ってしまう。
-また、親アクターがシステム内に存在せずに、親の親は存在しているという場合、親の親が次に生成するアクターの名前は被らないが、その子アクターが次に生成する名前は被ってしまう可能性がある。(図？)
+%% つまり、あるアクターについて、システム内に親アクターがいる場合、親アクターが次に生成する番号は自分の番号よりも大きい、ということにより、次に生成するアクターの名前が被らないようになっている。
+%% ただし、次に生成するアクターの名前は fresh でもその次に生成するアクターは fresh ではないこともある。
+%% 例えば、同じ名前でかつ次の generation number も同じという2つのアクターがいた場合、まず片方のアクターが生成するアクターの名前は fresh だが、その次にもう片方のアクターがアクターを生成したとすると、名前が被ってしまう。
+%% また、親アクターがシステム内に存在せずに、親の親は存在しているという場合、親の親が次に生成するアクターの名前は被らないが、その子アクターが次に生成する名前は被ってしまう可能性がある。(図？)
 
-以上のように gen\_fresh だけでは gen\_fresh を導けないので、gen\_fresh の証明には chain と no\_dup の性質が必要になる。
+Thus, to prove \textit{gen fresh preservation} proposition that \texttt{gen\_fresh} is preserved between transitions, it is necessary to use \texttt{chain} and \texttt{no\_dup} as hypotheses.
+%% The proof is by ...
+%% 以上のように gen\_fresh だけでは gen\_fresh を導けないので、gen\_fresh の証明には chain と no\_dup の性質が必要になる。
 
 \begin{lemma}{gen fresh preservation}
 \begin{displaymath}
@@ -121,7 +129,8 @@ This is the property we have to prove.
   \end{array}
 \end{displaymath}
 
-We prove no dup preservation property defined as the following.
+We proved \textit{no dup preservation} property defined as the following.
+It represents that if the actor names in the configuration is not duplicate and the next generated actor name is fresh, then the next configuration holds \texttt{no\_dup}.
 
 \begin{lemma}{no dup preservation}
 \begin{displaymath}
@@ -144,9 +153,9 @@ This is obvious by chain preservation, gen fresh preservation and no dup preserv
   \end{displaymath}
 \end{lemma}
 
-Second,
+Next, we prove that if trans invariant holds in initial configuration, trans invariant holds after arbitrary transitions.
 
-次に初期状態について trans\_invariant が成り立っていれば、任意回の遷移後も trans\_invariant が成り立つということをを証明する。
+%% 次に初期状態について trans\_invariant が成り立っていれば、任意回の遷移後も trans\_invariant が成り立つということをを証明する。
 
 \begin{lemma}{trans invariant preservation star}
   \begin{displaymath}
@@ -156,10 +165,10 @@ Second,
     \end{array}
   \end{displaymath}
 \end{lemma}
-$c \overset{l}{\leadsto\star} c'$ is reflexive transitive closure of transition.
+$c \overset{l}{\leadsto\star} c'$ represents reflexive transitive closure of transition.
 The proof is by induction of reflexive transitive closure of transition and trans invariant preservation.
 
-We can prove name uniqueness.
+Finally, we can prove name uniqueness.
 \begin{theorem}{name uniqueness}
   \begin{displaymath}
     \begin{array}{l}
