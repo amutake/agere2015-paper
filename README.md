@@ -28,10 +28,16 @@ Information
 #### Full papers
 
 - Abstract deadline: August 1, 2015
-- Paper deadline: August 7, 2015
-- Notification: September 7, 2015
+- Paper deadline: August 14, 2015
+- Notification: September 21, 2015
 
 ### Submission
 
 > Authors are invited to submit their papers in PDF using the [ACM SIG Proceedings style](http://www.acm.org/sigs/publications/proceedings-templates). Papers should be submitted via [EasyChair](https://easychair.org/conferences/?conf=agere2015).
 > long papers: up to 10 pages, including references
+
+### Websites
+
+* [main](http://soft.vub.ac.be/AGERE15)
+* [SPLASH](http://2015.splashcon.org/track/agere2015)
+* [researchr](http://conf.researchr.org/home/agere2015)
