@@ -34,13 +34,13 @@ of the number and customer is sent to the actor.
 
 \begin{figure}[t]
 \begin{lstlisting}[style=small]
-CoFixpoint factorial_cont_behv (val : nat)
+Definition factorial_cont_behv (val : nat)
                                (cust : name) :=
   receive (fun msg =>
     match msg with
      | nat_msg arg => cust ! nat_msg (val * arg);
                       become empty_behv
-     | _ => become (factorial_cont_behv val cust)
+     | _ => become empty_behv
     end).
 
 CoFixpoint factorial_behv :=
