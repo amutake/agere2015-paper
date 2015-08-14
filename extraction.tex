@@ -27,13 +27,15 @@ Figure \ref{coq:adt} is an example of extraction of the natural number type.
 \end{figure}
 
 However, actions of actors, for example \textsf{send}, \textsf{new}, \textsf{self}, \textsf{become} and \texttt{behavior} are implemented as value constructor of \texttt{actions} and \texttt{behavior} type
-We handle these constructors corresponding syntax of Erlang, as special
-ただし、アクターモデル特有である動作、例えば send, new, self, become, receive は、Actario では\texttt{actions}, \texttt{behavior} 型の値コンストラクタとして実装されているので、これだとただのタプルのデータとして抽出されてしまう。
-このようなアクションは Erlang では構文または関数となっているため、このようなアクションだけを特別扱いして、対応する Erlang のものに変換する必要がある。
+We handle these constructors as special to generate corresponding syntax of Erlang.
 
-例えば、以下の Actario を用いた Coq のコードは、
+%% ただし、アクターモデル特有である動作、例えば send, new, self, become, receive は、Actario では\texttt{actions}, \texttt{behavior} 型の値コンストラクタとして実装されているので、これだとただのタプルのデータとして抽出されてしまう。
+%% このようなアクションは Erlang では構文または関数となっているため、このようなアクションだけを特別扱いして、対応する Erlang のものに変換する必要がある。
 
-\begin{lstlisting}
+For example, Actario code shown in figure \ref{coq:extractionex} is extracted to Erlang code shown in figure \ref{erl:extractionex}.
+
+\begin{figure}[t]
+  \begin{lstlisting}
 CoFixpoint behvA :=
   receive (fun msg =>
     match msg with
@@ -46,11 +48,12 @@ CoFixpoint behvA :=
         child ! msg;
         become behvA
     end)
-\end{lstlisting}
+  \end{lstlisting}
+  \caption{Extraction example: Actario code}\label{coq:extractionex}
+\end{figure}
 
-以下のように抽出されるようにする。
-
-\begin{lstlisting}[language=erlang]
+\begin{figure}[t]
+  \begin{lstlisting}[language=erlang]
 behvA() ->
   receive Msg -> case Msg of
     {name_msg, Sender} ->
@@ -62,12 +65,17 @@ behvA() ->
       Child ! Msg
       behvA()
   end.
-\end{lstlisting}
+  \end{lstlisting}
+  \caption{Extraction example: Erlang code}\label{erl:extractionex}
+\end{figure}
 
 \subsection{Name}
-名前はプログラマが自分でコンストラクタから作るということはしないので、すべてが変数に格納されている。
-なので Erlang に変換すると変数になっている。
-Actario で書いたプログラムの name 型の変数には Actario での name 型の値に束縛されているが、Erlang に変換したあとのプログラムの対応する変数は Erlang のプロセスIDに束縛されている。
+In Actario, the programmer does not make actor names by constructor, so that all of actor names are in variables.
+Therefore, all of actor names in extracted code are variables.
+These variables are bound by values of name type in Actario, but in Erlang, these variables are bound by process ids.
+%% 名前はプログラマが自分でコンストラクタから作るということはしないので、すべてが変数に格納されている。
+%% なので Erlang に変換すると変数になっている。
+%% Actario で書いたプログラムの name 型の変数には Actario での name 型の値に束縛されているが、Erlang に変換したあとのプログラムの対応する変数は Erlang のプロセスIDに束縛されている。
 
 \subsection{Execution}
 The program extracted by Actario is impossible to execute by itself.
