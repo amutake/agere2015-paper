@@ -1,4 +1,4 @@
-.PHONY: pdf cont clean update
+.PHONY: pdf cont clean update final
 
 MAIN=sig-alternate
 TEXINPUTS=".:./sty//:"
@@ -14,3 +14,9 @@ clean:
 
 update:
 	mkluatexfontdb -vvv
+
+final:
+	TEXINPUTS=$(TEXINPUTS) latex $(MAIN)
+	TEXINPUTS=$(TEXINPUTS) bibtex $(MAIN)
+	TEXINPUTS=$(TEXINPUTS) latex $(MAIN)
+	dvipdfmx $(MAIN).dvi
