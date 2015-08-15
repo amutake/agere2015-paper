@@ -113,7 +113,7 @@ string), or a tuple of two messages.
 Figure~\ref{coq:actions} defines two mutually coinductive types:
 \lstinline|actions| and \lstinline|behavior|. They specify sequences
 of actions performed by actors and behaviors of actors respectively.
-Each constructor of actions corresponds to a single action embedded in
+Each constructor of \lstinline|actions| corresponds to a single action embedded in
 an action sequence as follows.
 \begin{description}
 
@@ -121,7 +121,7 @@ an action sequence as follows.
   behavior \(b\) and applies \(f\) to the name of the created
   actor. Then continues to the action sequence that \(f\) returns.
 
-\item[\texttt{snd} \(n\) \(m\) \(\alpha\)] sends message \(m\) to the
+\item[\texttt{send} \(n\) \(m\) \(\alpha\)] sends message \(m\) to the
   actor with name \(n\) and then continues to action sequence
   \(\alpha\).
 
@@ -146,9 +146,10 @@ to model such behaviors.
 
 In addition to the types defined above, Actario provides a collection
 of notations (syntactic sugaring) described in
-Figure~\ref{coq:notation} to support writing actor behaviors
-intuitively.  Figure~\ref{fig:notationexample} shows a simple action
-sequence described without/with the notations.
+Figure~\ref{coq:notation}.  Using the notations, we can write actor
+behaviors intuitively without being complicated by CPS.
+Figure~\ref{fig:notationexample} compares the descriptions of a simple
+action sequence without/with the notations.
 
 \begin{figure}
 \begin{lstlisting}
