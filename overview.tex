@@ -32,7 +32,7 @@ continuation actor (\lstinline|cont|) and recursively sends itself a
 pair of \lstinline|n| and \lstinline|cont|.  The behavior of
 continuation actors is specified as \lstinline|factorial_cont_behv|.
 
-\begin{figure}[t]
+\begin{figure}
 \begin{lstlisting}[style=small]
 Definition factorial_cont_behv (val : nat)
                                (cust : name) :=
@@ -85,9 +85,9 @@ Inductive message : Set :=
  | tuple_msg : message -> message -> message.
 \end{lstlisting}
 \caption{Message Type}\label{coq:message}
-\end{figure}
-
-\begin{figure}
+%\end{figure}
+%\begin{figure}
+\hspace*{1em}
 \begin{lstlisting}
 CoInductive actions : Type :=
  | new : behavior -> (name -> actions) -> actions
