@@ -14,7 +14,7 @@ It is used like traditional \lstinline|Extraction| command.
 
 Values of algebraic data types are extracted to a tuple with the label.
 Value constructor is extracted to a label, and arguments are extracted to the second and the following elements of the tuple.
-Figure \ref{coq:adt} is an example of extraction of the natural number type.
+Figure~\ref{coq:adt} is an example of extraction of the natural number type.
 
 \begin{figure}[t]
   \begin{lstlisting}
@@ -34,7 +34,7 @@ We handle these constructors as special to generate the corresponding syntax of 
 %% ただし、アクターモデル特有である動作、例えば send, new, self, become, receive は、Actario では\texttt{actions}, \texttt{behavior} 型の値コンストラクタとして実装されているので、これだとただのタプルのデータとして抽出されてしまう。
 %% このようなアクションは Erlang では構文または関数となっているため、このようなアクションだけを特別扱いして、対応する Erlang のものに変換する必要がある。
 
-For example, Actario code shown in figure \ref{coq:extractionex} is extracted to Erlang code shown in figure \ref{erl:extractionex}.
+For example, Actario code shown in Figure~\ref{coq:extractionex} is extracted to Erlang code shown in Figure~\ref{erl:extractionex}.
 
 \begin{figure}[t]
   \begin{lstlisting}
@@ -82,7 +82,7 @@ These variables are bound by values of name type in Actario, but in Erlang, thes
 \subsection{Execution}
 The program extracted by Actario is impossible to execute by itself.
 So Actario's programmers have to write executor to execute the extracted Actor system in Erlang.
-For example, we consider factorial system described in section \ref{sec:overview}.
+For example, we consider factorial system described in Section~\ref{sec:overview}.
 
 \begin{lstlisting}
 Definition factorial_system (n : nat) (parent : name) : config :=

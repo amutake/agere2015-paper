@@ -17,7 +17,7 @@ Computation entity called \textit{actor} communicates other actors with asynchro
 最近になっていくつかの研究成果が出ている。
 
 In the Actor model, actors send messages by specifying destination actor name, so that fresh naming of actor names is important.
-In realistic actor languages and libraries, such as Erlang and Scala Akka, It can generate actors without explicit naming by a programmer.
+In realistic actor languages and libraries, such as Erlang \cite{Erlang} and Scala \cite{Scala} Akka \cite{Akka}, It can generate actors without explicit naming by a programmer.
 If the naming is explicit, sometimes it is difficult to guarantee name uniqueness in realistic and complex systems.
 
 In this paper, we propose Actario, a Coq framework for implementing and verifying actor systems \cite{Actario}. Actario is publicly available.
@@ -68,12 +68,12 @@ Actario itself is verified for satisfying properties of the Actor model, the fol
 % * Erlangプログラムを生成できる
 
 The layout of the rest of this paper is the following.
-In section \ref{sec:overview}, we describe overview of Actario.
-In section \ref{sec:semantics}, we give the operational semantics of the Actor model formalized in Actario.
-In section \ref{sec:uniqueness}, we explain how to prove that dynamically generated names are always unique.
-In section \ref{sec:fairness}, we formalize fairness property.
-In section \ref{sec:extraction}, we describe extraction mechanism of Actario.
-In section \ref{sec:relatedwork}, we show related work, and in section \ref{sec:conclusion}, we conclude the paper.
+In Section~\ref{sec:overview}, we describe overview of Actario.
+In Section~\ref{sec:semantics}, we give the operational semantics of the Actor model formalized in Actario.
+In Section~\ref{sec:uniqueness}, we explain how to prove that dynamically generated names are always unique.
+In Section~\ref{sec:fairness}, we formalize fairness property.
+In Section~\ref{sec:extraction}, we describe extraction mechanism of Actario.
+In Section~\ref{sec:relatedwork}, we show related work, and in Section~\ref{sec:conclusion}, we conclude the paper.
 
 %% 2節では Actario で使うアクターのシンタックスを説明する。
 %% 3節では Actario で用いるアクターモデルの意味論について説明する。
