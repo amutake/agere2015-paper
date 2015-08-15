@@ -9,7 +9,7 @@ Musser and Varela are formalized the Actor model in the Athena theorem prover \c
 In this paper, name uniqueness is proven.
 However, a programmer has to name new actors explicitly.
 Therefore, a programmer has to select a fresh name. It is difficult to give always fresh name in complex system.
-In addition, it is impossible to run program built in the formalization, while Actario can by extraction.
+In addition, it is impossible to run the program built in the formalization, while Actario can by extraction.
 %% これは transition path を遷移のラベルの列としている。
 %% この形式化では遷移の間で名前の一意性が証明されているが、 % note: creating, trans-create, unique-ids-persistence in transition.ath
 %% この形式化を用いてプログラミングする際には名前をプログラマが明示的に与えなければならないので、アクターを生成するときには名前が重複しないように注意深く設定しなければならない。
@@ -18,7 +18,7 @@ In addition, it is impossible to run program built in the formalization, while A
 
 Verdi is a framework for constructing and verifying fault-tolerant distributed systems \cite{Verdi}.
 A system assumed no network failure is converted to the system which tolerates dropping packets, duplication of packets, and machine failure.
-One of the purpose of Actario is also to build and verify fault-tolerant distributed systems.
+One of the purposes of Actario is also to build and verify fault-tolerant distributed systems.
 We will introduce \textit{supervisor} mechanism to achieve building fault-tolerant systems generally used in Erlang and Akka.
 \note{Supervisor についての説明はいるかどうか}
 %% Supervisor is used for fault-tolerance and rapid recovery in the system, introduced in Erlang, Akka, and so on.
@@ -29,5 +29,5 @@ We will introduce \textit{supervisor} mechanism to achieve building fault-tolera
 %% Supervisor は Erlang や Akka で取り入れられている考え方で、
 
 Tony Garnock-Jones, Sam Tobin-Hochstadt, and Matthias Felleisen give a formalization of the Actor model using Coq \cite{Garnock-Jones:2014aa}.
-In this paper, operational semantics is formalized so that transition is decidable.
+In this paper, the operational semantics is formalized so that transition is decidable.
 Due to this, it is difficult to apply the formalization to realistic concurrent systems.
