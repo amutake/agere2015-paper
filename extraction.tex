@@ -12,9 +12,9 @@ It is used like traditional \lstinline|Extraction| command.
 
 \subsection{Data Types}
 
-Values of algebraic data types are extracted to tuple with label.
-Value constructor is extracted to label, and arguments are extracted to the second and the following elements of the tuple.
-Figure \ref{coq:adt} is an example of extraction of the natural number type.
+Values of algebraic data types are extracted to a tuple with the label.
+Value constructor is extracted to a label, and arguments are extracted to the second and the following elements of the tuple.
+Figure~\ref{coq:adt} is an example of extraction of the natural number type.
 
 \begin{figure}[t]
   \begin{lstlisting}
@@ -28,13 +28,13 @@ Figure \ref{coq:adt} is an example of extraction of the natural number type.
   \caption{example of extraction of algebraic data types}\label{coq:adt}
 \end{figure}
 
-However, actions of actors, for example \textsf{send}, \textsf{new}, \textsf{self}, \textsf{become} and \texttt{behavior} are implemented as value constructor of \texttt{actions} and \texttt{behavior} type
-We handle these constructors as special to generate corresponding syntax of Erlang.
+However, actions of actors, for example, \textsf{send}, \textsf{new}, \textsf{self}, \textsf{become} and \texttt{behavior} are implemented as value constructor of \texttt{actions} and \texttt{behavior} type
+We handle these constructors as special to generate the corresponding syntax of Erlang.
 
 %% ただし、アクターモデル特有である動作、例えば send, new, self, become, receive は、Actario では\texttt{actions}, \texttt{behavior} 型の値コンストラクタとして実装されているので、これだとただのタプルのデータとして抽出されてしまう。
 %% このようなアクションは Erlang では構文または関数となっているため、このようなアクションだけを特別扱いして、対応する Erlang のものに変換する必要がある。
 
-For example, Actario code shown in figure \ref{coq:extractionex} is extracted to Erlang code shown in figure \ref{erl:extractionex}.
+For example, Actario code shown in Figure~\ref{coq:extractionex} is extracted to Erlang code shown in Figure~\ref{erl:extractionex}.
 
 \begin{figure}[t]
   \begin{lstlisting}
@@ -72,7 +72,7 @@ behvA() ->
 \end{figure}
 
 \subsection{Name}
-In Actario, the programmer does not make actor names by constructor, so that all of actor names are in variables.
+In Actario, a programmer does not make actor names from constructors, so that all of actor names are in variables.
 Therefore, all of actor names in extracted code are variables.
 These variables are bound by values of name type in Actario, but in Erlang, these variables are bound by process ids.
 %% 名前はプログラマが自分でコンストラクタから作るということはしないので、すべてが変数に格納されている。
@@ -82,7 +82,7 @@ These variables are bound by values of name type in Actario, but in Erlang, thes
 \subsection{Execution}
 The program extracted by Actario is impossible to execute by itself.
 So Actario's programmers have to write executor to execute the extracted Actor system in Erlang.
-For example, we consider factorial system described in section \ref{sec:overview}.
+For example, we consider factorial system described in Section~\ref{sec:overview}.
 
 \begin{lstlisting}
 Definition factorial_system (n : nat) (parent : name) : config :=

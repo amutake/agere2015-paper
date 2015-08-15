@@ -36,8 +36,7 @@ Definition is_transition_path (p : path) : Prop :=
 
 \subsection{enabled}
 We define the predicate that the transition from the given configuration with the given label is possible, called \texttt{enabled}.
-\texttt{enabled} is defined as there exists a configuration after transitioning from the configuration with the label.
-In Actario, \texttt{enabled} is defined as follows.
+In Actario, \texttt{enabled} is defined as there exists a configuration after transitioning from the configuration with the label, as follows.
 %% ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
 
 \begin{lstlisting}
@@ -47,6 +46,7 @@ Definition enabled (c : config) (l : label) : Prop :=
 
 \subsection{infinitely often enabled}
 We define the predicate that the transition is infinitely often enabled in the transition path.
+It is named \texttt{infinitely often enabled}.
 %% これは、すべての index n について、n 番目の configuration があるラベルによって遷移が可能ならば、その先そのラベルによって遷移が可能になる configuration が存在する、と定義する。
 
 \begin{lstlisting}
