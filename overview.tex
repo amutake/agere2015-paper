@@ -6,22 +6,31 @@
 Actario is a Coq framework for defining and verifying actor-based
 systems. A typical workflow using Actario is as follows.
 \begin{enumerate}
-\item Describe an actor-based system using types and notations defined in the framework.
+\item Describe an actor system using types and notations defined in the framework.
 \item Specify and verify desired properties of the system.
 \item Extract the Erlang version of the system using the code extraction mechanism of Coq.
 \end{enumerate}
+Note that Actario does not provide a dedicated language for describing
+actor systems.  The framework offers a set of Coq vocabularies (types
+and notations described in Section~\ref{sec:typesandnotations}) for
+that purpose.
+
 
 \paragraph{Example: Recursive Factorial System}
-Let us use a simple example to illustrate the usage of Actario.
-Figure~\ref{coq:fact} is the definition of an actor system that implements the
-continuation-passing style factorial function adapted from
-\cite{Agha:1986aa}.  Two recursive functions \lstinline|factorial_behv| and
-\lstinline|factorial_cont_behv| define the behaviors of factorial actors and
-continuation actors respectively.  The function \lstinline|factorial_system| the
-system by being applied to a natural number and the name of a customer
-actor that is intended to receive the final result.  In this function,
-a factorial actor is created and bound to the variable \lstinline|x|, then a pair
-of the number and customer is sent to the actor.
+We use a simple example to illustrate a system description in Actario.
+Figure~\ref{coq:fact} shows the definition of an actor system that
+implements the continuation-passing style factorial function adapted
+from \cite{Agha:1986aa}.  In this definition, the function
+\lstinline|factorial_system| sets up a system that initially consists
+of a single factorial actor whose behavior is defined as
+\lstinline|factorial_behv|.  The actor can receive a tuple of a
+natural number and the name of a \emph{customer} actor
+(\lstinline|cust|) that is intended to receive the result.  If the
+first component of tuple is more than zero, \textit{i.e.}, it matches
+the successor pattern \lstinline|S n|, the actor creates a new
+continuation actor (\lstinline|cont|) and recursively sends itself a
+pair of \lstinline|n| and \lstinline|cont|.  The behavior of
+continuation actors is specified as \lstinline|factorial_cont_behv|.
 
 \begin{figure}[t]
 \begin{lstlisting}[style=small]
@@ -65,13 +74,7 @@ Definition factorial_system (n : nat) (cust : name) :=
 %% \end{figure}
 
 
-\subsection{Types and Notations}
-
-\subsubsection{Messages}
-アクター間で取り交わされるメッセージの型 \texttt{message} は図\ref{coq:message}と定義されている。
-空のメッセージ、アクターの名前のメッセージ、基本的な型 (自然数、文字列、ブール値) のメッセージ、タプルのメッセージを扱うことができる。
-
-\begin{figure}[tb]
+\begin{figure}
 \begin{lstlisting}
 Inductive message : Set :=
  | empty_msg : message
@@ -84,14 +87,7 @@ Inductive message : Set :=
 \caption{Message Type}\label{coq:message}
 \end{figure}
 
-
-\subsubsection{Actions and Behaviors}
-
-\texttt{actions} はアクターが行うアクションの列を表す型である。
-アクションの種類は、他のアクターに向けてメッセージを送る\texttt{send}、新しいアクターを作る\texttt{new}、自分自身の名前を得る\texttt{self}、次のメッセージに対する振る舞いを決める\texttt{become}があり、これらが \texttt{actions} の値コンストラクタとなっている。
-behavior is defined as a function from message to actions.
-
-\begin{figure}[tb]
+\begin{figure}
 \begin{lstlisting}
 CoInductive actions : Type :=
  | new : behavior -> (name -> actions) -> actions
@@ -104,41 +100,57 @@ with behavior : Type :=
 \caption{Types for Actions and Behaviors}\label{coq:actions}
 \end{figure}
 
-\texttt{actions} および \texttt{behavior} は Actario では図\ref{coq:actions} のように定義されている。
-\texttt{actions} のそれぞれのコンストラクタを説明する。
+\subsection{Types and Notations}\label{sec:typesandnotations}
 
-\begin{list}{}{%
-%    \setlength{\labelwidth}{0pt}
-%    \setlength{\labelsep}{0pt}
-    \setlength{\leftmargin}{1.5em}
-    \setlength{\itemindent}{-1.5em}
-}
-\item \lstinline|new : behavior -> (name -> actions) -> actions|\\
-  新しいアクターを生成するアクションである。
-  引数として与えられたある behavior を initial behavior として新しいアクターを生成し、その名前をアクションの継続に渡す。
-\item \lstinline|send : name -> message -> actions -> actions|\\
-  指定した名前のアクターにメッセージを送るアクションである。
-  第一引数に指定した名前のアクターに、第二引数で指定したメッセージを送り、第三引数で指定したその後のアクションを実行する、という意味である。
-\item \lstinline|self : (name -> actions) -> actions| \\
-  自分自身の名前を得るアクションである。
-  自分の名前を第一引数で与えられた継続に渡し、残りのアクションを得る。
-\item \lstinline|become : behavior -> actions| \\
-  次のメッセージに対して指定した振る舞いで処理する。
-  また、次のメッセージの待ち状態になることも表し、これ以降アクションは取れないようになっている。
-\end{list}
+\subsubsection{Types}
 
-actions と behavior は co-inductive types として定義される。
-これは become で現在の behavior を指定したり、ある他の behavior と相互再帰するようなことがあるからである。
-Coq ではこのような、コンストラクタの深さが小さくならない再帰は通常の inductive definition では書けなくなっている。
+Figure~\ref{coq:message} shows the inductively defined type of messages delivered
+among actors, each of whose constructors corresponds to a kind of
+messages.  In the current version of Actario, a message may be empty,
+an actor name, a value of basic types (Boolean, natural number or
+string), or a tuple of two messages.
+
+Figure~\ref{coq:actions} defines two mutually coinductive types:
+\lstinline|actions| and \lstinline|behavior|. They specify sequences
+of actions performed by actors and behaviors of actors respectively.
+Each constructor of actions corresponds to a single action embedded in
+an action sequence as follows.
+\begin{description}
+
+\item[\texttt{new} \(b\) \(f\)] creates a new actor with initial
+  behavior \(b\) and applies \(f\) to the name of the created
+  actor. Then continues to the action sequence that \(f\) returns.
+
+\item[\texttt{snd} \(n\) \(m\) \(\alpha\)] sends message \(m\) to the
+  actor with name \(n\) and then continues to action sequence
+  \(\alpha\).
+
+\item[\texttt{self} \(f\)] retrieves the name of the actor that executes this
+  action and applies \(f\) to it. Then continues to the action sequence
+  that \(f\) returns.
+
+\item[\texttt{become} \(b\)] sets \(b\) as the next behavior of the
+  actor that executes this action. This action should end an action
+  sequence.
+\end{description}
+
+In the Actor model, an actor persists indefinitely. Thus, as shown in
+Figure~\ref{coq:fact}, that a behavior may have \lstinline|become|
+actions that specify itself or other behaviors eventually recurring to
+the original one.  The reason for using \lstinline|CoFixpoint| and
+defining \lstinline|actions| and \lstinline|behavior| coinductively is
+to model such behaviors.
+
 
 \subsubsection{Notations}
 
-また、アクターモデルを採用しているプログラミング言語に近づけるように図\ref{coq:notation}のような notation をつけている。
-\lstinline|n <- new behv; cont| は \lstinline|new behv (fun n => cont)| に変換され、
-\lstinline|n ! msg; cont| は \lstinline|send n msg cont| に変換され、
-\lstinline|me <- self; cont| は \lstinline|self (fun me => cont)| に変換される。
+In addition to the types defined above, Actario provides a collection
+of notations (syntactic sugaring) described in
+Figure~\ref{coq:notation} to support writing actor behaviors
+intuitively.  Figure~\ref{fig:notationexample} shows a simple action
+sequence described without/with the notations.
 
-\begin{figure}[tb]
+\begin{figure}
 \begin{lstlisting}
 Notation ``n '<-' 'new' behv ; cont'' :=
     (new behv (fun n => cont))
@@ -150,4 +162,27 @@ Notation ``me '<-' 'self' ';' cont'' :=
     (at level 0, cont at level 10).
 \end{lstlisting}
 \caption{Notations for Actions}\label{coq:notation}
+\end{figure}
+
+\begin{figure}\centering
+\begin{minipage}{0.2\textwidth}\centering
+\begin{lstlisting}[frame=single]
+new $b$ (fun x =>
+self (fun s =>
+send x (name_msg s)
+(become $b'$)))
+\end{lstlisting}
+(a) without notations
+\end{minipage}
+\hspace*{3ex}
+\begin{minipage}{0.2\textwidth}\centering
+\begin{lstlisting}[frame=single]
+x <- new $b$;
+s <- self;
+x ! (name_msg s);
+become $b'$
+\end{lstlisting}
+(b) with notations
+\end{minipage}
+\caption{Example Use of Notations}\label{fig:notationexample}
 \end{figure}
