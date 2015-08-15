@@ -202,11 +202,11 @@ The two main characteristics of the Actor model are asynchronous message passing
 %
 %APPENDICES are optional
 %\balancecolumns
+\newpage
 \appendix
-\section{labeled transition semantics in Actario}
-\label{app:lts}
-\begin{figure}[t]
-\begin{lstlisting}
+\section{Labeled Transition Semantics in Actario}\label{app:lts}
+\begin{figure}[b]
+\begin{lstlisting}[style=small]
 Reserved Notation "c1 '~(' t ')~>' c2" (at level 60).
 Inductive trans : label -> config -> config -> Prop :=
 (* receive transition *)
@@ -242,6 +242,6 @@ Inductive trans : label -> config -> config -> Prop :=
         sendings >< (actors_l ++ Build_actor me (cont me) gen :: actors_r)
 where "c1 '~(' t ')~>' c2" := (trans t c1 c2).
 \end{lstlisting}
-\caption{definition of labeled transition semantics in Actario}\label{fig:coq:semantics}
+\caption{Labeled Transition Semantics in Actario}\label{fig:coq:semantics}
 \end{figure}
 \end{document}
