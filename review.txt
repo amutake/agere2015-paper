@@ -1,0 +1,106 @@
+----------------------- REVIEW 1 ---------------------
+PAPER: 4
+TITLE: Actario: A Framework for Reasoning About Actor Systems
+AUTHORS: Shohei Yasutake and Takuo Watanabe
+
+OVERALL EVALUATION: 2 (accept)
+
+----------- REVIEW -----------
+Summary of the paper: 
+
+The paper presents a Coq framework for describing and verifying actor-based systems. The actor systems can be specified using predefined set of Coq types and notations. The semantics of the presented actor model are given as an LTS. The model supports a mechanism for implicit naming of actors which is proven to satisfy the property of name uniqueness. If a system starts with distinctive actor names, all newly generated actors have distinctive names. Authors also formalise the strong fairness properties which states that if an actor is infinitely often ready to receive a message then the message is eventually received. In addition, the framework supports extraction of actor systems written in Coq to Erlang programs. Examples of such programs are given.  
+
+Overall evaluation: 
+
+The paper looks at an interesting problem, mainly establishing a mechanized formal verification method for actor systems. It is well-written and easy to follow. The mechanism for implicit naming is simple and yet it seems powerful. My only worry is if this mechanism is applicable to existing actor systems and moreover to distributed actor systems, mainly because it requires name uniqueness of the top level actors, which is very hard to guarantee in a distributed setting.
+
+Overall I enjoyed reading the paper, I have minor criticisms and suggestions for improvements that I have listed below.  
+
+Introduction: 
+
+-- It is not clear what is the difference between the presented framework and the other actor verification frameworks in Athena and Coq. 
+Fairness
+The definitions of predicates are not given uniformly (Only in Section 5 they are in Coq). 
+
+Section 5 seems written in a hurry and the formatting of the Coq code can be improved. My main criticism is that the purpose of the section is unclear. I guess the authors wanted to give an example of how to define a property in their system. Is there a reason they chose fairness, maybe because it is more challenging? This point should be explained. 
+
+Erlang extraction 
+
+--It is said “It is not proven that the extraction mechanism does not change the meaning ...”. Authors should elaborate on this or at least give some intuition which properties (if any) can be preserved. 
+-- Name uniqueness doesn’t seem to be preserved when generating Erlang code. All children are generated via spawn which returns a Pid and therefore does not implement the implicit naming, spawn() in Erlang returns different Pid independent of the Parent Pid. Moreover, in a multi process architecture (which is often the case where Erlang is used) - spawn() can return same Pids. I think discussion on that might be of interest.
+
+Conclusion
+
+-- In conclusion, authors claim the model satisfies actor and message persistence, but this is neither explained, nor mentioned previously in the paper. 
+
+Minor comments: 
+
+-- the titles of the subsections are not uniformed 
+-- define an predicate -> define a predicate
+
+
+----------------------- REVIEW 2 ---------------------
+PAPER: 4
+TITLE: Actario: A Framework for Reasoning About Actor Systems
+AUTHORS: Shohei Yasutake and Takuo Watanabe
+
+OVERALL EVALUATION: 0 (borderline paper)
+
+----------- REVIEW -----------
+In this paper, the authors describe a framework for reasoning in Coq about actors. They mostly focus in their presentation on the name allocation mechanism and on checking fairness of traces which are two key elements in order to prove properties of actors.
+
+My overall opinion on this paper is that it is extremely promising. However, I was a little disappointed by the overall contribution, at least by the parts that are presented in the paper. Except from a few mistakes in translating coq into latex, I think that the approach is sound but I would have expected a little more contribution, either on the side of generic properties, or on the reasoning capacities on individual programs. For example, the fairness property is defined but never used. Concerning name generation, the approach is quite classical and unsurprising; even if it is always good to have the properties proven, this part could be presented more briefly. Overall I think the authors could have shortened drastically the current content of the paper and included more interesting stuff … exactly because this work is promising and should allow them to bring interesting properties and reasoning capabilities to the actor community.
+
+Concerning the chosen language/syntax, the fact that there is no user-defined name for messages, does not fit well with the actor model. For reasoning on the actor model it might be expressive enough, even if I am not sure and I would have appreciated a justification on this point. However, for generating code and writing a real actor program, I am quite convinced that this lack of expressiveness will be an issue in practice. As the authors mention code generation, I think the authors should give arguments about this if they do not change their formalisation.
+
+At two points (4.2 and 4.3), the authors use a predicate of the form \exists p,  Q(p) => R(p). This is not correct(*) because what the authors mean is \forall p, (Q(p)=>R(p)). Fortunately, the coq source code is correct I think.
+
+Concerning code execution, the authors present a part “to be written by the programmer”: could not you make it more generic and have the programmer write something simpler?
+(btw I do not think that the source code of nat2int and int2nat is worth spending 6 lines, a brief explanation would be sufficient)
+
+Concerning related works, you might also want to mention other formalisation of other languages in theorem provers, like:
+— Engineering formal metatheory that focuses on names and binding in Coq
+Brian Aydemir, Arthur Chargueraud,	Benjamin C. Pierce, Randy Pollack, Stephanie Weirich
+
+- See also works on Nominal Isabelle by Christian Urban for Isabelle/HOL
+
+- ASPfun : A typed functional active object calculus (functional active objects are quite close to actors; in Isabele/HOL)
+   Ludovic Henrio, Florian Kammüller, Bianca Lutz
+
+———————
+(*) p is not well bound, and depending on brackets, \exists p,  Q(p) => R(p) either means (\exists p,  Q(p)) => R(p), i.e.: \forall p , (\exists p,  Q(p)) => R(p) which roughly means \forall p , R(p)
+	or it means \exists p,  (Q(p) => R(p)), which is true as soon as \exists p,  not (Q(p))
+
+
+----------------------- REVIEW 3 ---------------------
+PAPER: 4
+TITLE: Actario: A Framework for Reasoning About Actor Systems
+AUTHORS: Shohei Yasutake and Takuo Watanabe
+
+OVERALL EVALUATION: -1 (weak reject)
+
+----------- REVIEW -----------
+Summary
+-------
+
+Actario is a Coq formalization of the actor model. Actario provides Erlang-like notations and a naming mechanism that generates unique names for new actors. Furthermore, is is possible to extract Erlang code from an Actario system model.
+
+The paper starts with a example of actors computing a factorial function and then proceeds to explain the different parts of Actario: syntax, types, and semantics. The naming mechanism uses the parents relation and the indexes the children to generate fresh names for new actors. The mechanism is proven correct in Coq. Strong fairness for message reception is defined by quantification of transitions and indices in execution paths. Finally, the authors describe the code extraction and show the Erlang code corresponding to the factorial example.
+
+
+Review
+------
+
+The paper is a dry and very syntactic presentation of Actario. Using Coq gives confidence in the correctness of the formalization. However, the paper lacks motivation and an evaluation.
+
+Name generation seems to be one of the main novelty, but it is not a major point. In the end, the extracted code relies on Erlang's name generation mechanism.
+
+The authors should spend more time on explaining what are Actario's strengths, its use case, and why a potential user should try Actario (using some concrete example).
+
+Concerning an evaluation, what programs/examples have been proven correct using Actario?  How does the extracted code performs compared to programs doing the same task written natively in Erlang ? etc.
+
+
+Minor
+-----
+
+The font size seem to have been reduced compared to the original template. On the other hand, the paper does not reach the page limit. The font size should be set back to the default size.
