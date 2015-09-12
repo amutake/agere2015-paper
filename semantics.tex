@@ -52,7 +52,7 @@ Record actor := {
 
 \subsection{in flight message}
 Next, we define \lstinline|in_flight_message| type which represents messages in flight in the configuration.
-\lstinline|in_flight_message| consists of the name of the destination, the name of the sender, and the content of the message (Figure~\ref{coq:inflight}).
+\break\lstinline|in_flight_message| consists of the name of the destination, the name of the sender, and the content of the message (Figure~\ref{coq:inflight}).
 %% 宛先と送り主とメッセージの内容からなるレコード型である (図\ref{coq:inflight}))。
 %% まだ受け取られていないメッセージを表す。
 %% configuration に用いる。
@@ -131,7 +131,8 @@ For the later explanation, we define the symbols as shown in Figure~\ref{fig:con
     \begin{array}{rclcl}
       c & \in & \textit{Configuration} & =   & \textit{Set(InFlight)} \times \textit{Set(Actor)} \\
       a & \in & \textit{Actor}  & =   & \textit{Name} \times \textit{Actions} \times \mathbb{N} \\
-      n & \in & \textit{Name}   & ::= & \textsf{toplevel}(s) \mid \textsf{generated}(g, n) \\
+      n & \in & \textit{Name}   & ::= & \textsf{toplevel}(s) \\
+        &     &                 &   | & \textsf{generated}(g, n) \\
       m & \in & \textit{Message} & =  & \textit{Name} + \textit{PrimVal} + \\
         &     &                 &     & \textit{Message} \times \cdots \times \textit{Message} \\
       i & \in & \textit{InFlight} & = & \textit{Name} \times \textit{Name} \times \textit{Message} \\
@@ -144,7 +145,7 @@ For the later explanation, we define the symbols as shown in Figure~\ref{fig:con
         &     &                 &   | & \textsf{Send}(n, n, m) \\
         &     &                 &   | & \textsf{New}(n) \\
         &     &                 &   | & \textsf{Self}(n) \\
-      \kappa & \in & \textit{Name} \rightarrow \textit{Actions} & & \\
+      \kappa & \in & \textit{Name} \rightarrow \textit{Actions} \\
       g & \in & \mathbb{N} & &
     \end{array}
   \end{displaymath}
