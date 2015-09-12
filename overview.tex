@@ -38,8 +38,9 @@ Definition factorial_cont_behv (val : nat)
                                (cust : name) :=
   receive (fun msg =>
     match msg with
-     | nat_msg arg => cust ! nat_msg (val * arg);
-                      become empty_behv
+     | nat_msg arg =>
+       cust ! nat_msg (val * arg);
+       become empty_behv
      | _ => become empty_behv
     end).
 
@@ -49,15 +50,19 @@ CoFixpoint factorial_behv :=
      | tuple_msg (nat_msg 0) (name_msg cust) =>
        cust ! nat_msg 1;
        become factorial_behv
-     | tuple_msg (nat_msg (S n)) (name_msg cust) =>
-       cont <- new (factorial_cont_behv (S n) cust);
+     | tuple_msg (nat_msg (S n))
+                 (name_msg cust) =>
+       cont <- new
+               (factorial_cont_behv (S n) cust);
        me <- self;
-       me ! tuple_msg (nat_msg n) (name_msg cont);
+       me ! tuple_msg (nat_msg n)
+                      (name_msg cont);
        become factorial_behv
      | _ => become factorial_behv
     end).
 
-Definition factorial_system (n : nat) (cust : name) :=
+Definition factorial_system (n : nat)
+                            (cust : name) :=
   init "factorial" (
     x <- new factorial_behv;
     x ! tuple_msg (nat_msg n) (name_msg cust);
@@ -153,21 +158,21 @@ action sequence without/with the notations.
 
 \begin{figure}
 \begin{lstlisting}
-Notation ``n '<-' 'new' behv ; cont'' :=
-    (new behv (fun n => cont))
-    (at level 0, cont at level 10).
-Notation ``n '!' m ';' a'' :=
-    (send n m a) (at level 0, a at level 10).
-Notation ``me '<-' 'self' ';' cont'' :=
-    (self (fun me => cont))
-    (at level 0, cont at level 10).
+Notation "n '<-' 'new' behv ; cont" :=
+  (new behv (fun n => cont))
+  (at level 0, cont at level 10).
+Notation "n '!' m ';' a" :=
+  (send n m a) (at level 0, a at level 10).
+Notation "me '<-' 'self' ';' cont" :=
+  (self (fun me => cont))
+  (at level 0, cont at level 10).
 \end{lstlisting}
 \caption{Notations for Actions}\label{coq:notation}
 \end{figure}
 
 \begin{figure}\centering
 \begin{minipage}{0.2\textwidth}\centering
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[frame=single,numbers=none,xleftmargin=0pt]
 new $b$ (fun x =>
 self (fun s =>
 send x (name_msg s)
@@ -177,7 +182,7 @@ send x (name_msg s)
 \end{minipage}
 \hspace*{3ex}
 \begin{minipage}{0.2\textwidth}\centering
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[frame=single,numbers=none,xleftmargin=0pt]
 x <- new $b$;
 s <- self;
 x ! (name_msg s);

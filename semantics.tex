@@ -25,8 +25,8 @@ For more detail about name uniqueness, see Section~\ref{sec:uniqueness}.
 \begin{figure}[t]
 \begin{lstlisting}
 Inductive name : Set :=
-| toplevel : string -> name
-| generated : nat -> name -> name.
+ | toplevel : string -> name
+ | generated : nat -> name -> name.
 \end{lstlisting}
 \caption{name}\label{coq:name}
 \end{figure}
@@ -76,7 +76,8 @@ In Actario, a configuration consists of a list of actors and a list of messages 
 \begin{figure}[t]
 \begin{lstlisting}
 Record config := {
-  in_flight_messages : list in_flight_message;
+  in_flight_messages :
+    list in_flight_message;
   actors : list actor
 }.
 \end{lstlisting}
@@ -110,10 +111,12 @@ The explanations of each label are as follows.
 \begin{figure}[t]
 \begin{lstlisting}
 Inductive label :=
-| Receive (to : name) (from : name) (content : message)
-| Send (from : name) (to : name) (content : message)
-| New (child : name)
-| Self (me : name).
+ | Receive (to : name) (from : name)
+     (content : message)
+ | Send (from : name) (to : name)
+     (content : message)
+ | New (child : name)
+ | Self (me : name).
 \end{lstlisting}
 \caption{label}\label{coq:label}
 \end{figure}

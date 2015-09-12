@@ -86,8 +86,8 @@ We translate the proposition that next generated name is fresh to the following.
 \begin{displaymath}
   \begin{array}{l}
     \texttt{gen\_fresh}(c) := \\
-    \quad \forall a \in \texttt{actors}(c), \forall p, p = \texttt{parent}(a) \wedge p \in \texttt{actors}(c) \Rightarrow \\
-    \quad \quad \quad \quad \texttt{gen\_number}(a) < \texttt{next\_number}(p)
+    \quad \forall a \in \texttt{actors}(c), \forall p \in \texttt{actors}(c), p = \texttt{parent}(a) \Rightarrow \\
+    \quad \quad \quad \texttt{gen\_number}(a) < \texttt{next\_number}(p)
   \end{array}
 \end{displaymath}
 
@@ -149,7 +149,8 @@ This is obvious by chain preservation, gen fresh preservation and no dup preserv
   \begin{displaymath}
     \begin{array}{l}
       \forall c, c' \in \textit{Configuration}, \forall l \in \textit{Label}, \\
-      \quad \texttt{trans\_invariant}(c) \wedge c \overset{l}{\leadsto} c' \Rightarrow \texttt{trans\_invariant}(c')
+      \quad \texttt{trans\_invariant}(c) \wedge c \overset{l}{\leadsto} c' \Rightarrow \\
+      \quad \texttt{trans\_invariant}(c')
     \end{array}
   \end{displaymath}
 \end{lemma}
@@ -162,7 +163,8 @@ Next, we prove that if trans invariant holds in initial configuration, trans inv
   \begin{displaymath}
     \begin{array}{l}
       \forall c, c' \in \textit{Configuration}, \forall l \in \textit{Label}, \\
-      \quad \texttt{trans\_invariant}(c) \wedge c \overset{l}{\leadsto\star} c' \Rightarrow \texttt{trans\_invariant}(c')
+      \quad \texttt{trans\_invariant}(c) \wedge c \overset{l}{\leadsto\star} c' \Rightarrow \\
+      \quad \texttt{trans\_invariant}(c')
     \end{array}
   \end{displaymath}
 \end{lemma}
