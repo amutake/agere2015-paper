@@ -2,7 +2,7 @@
 \section{Labeled Transition Semantics in Actario}\label{app:lts}
 The full labeled transition semantics described in Section~\ref{sec:semantics} is shown in Figure~\ref{fig:coq:semantics}.
 The each of inductive constructors corresponds to each transitions of Figure~\ref{fig:semantics}.
-\begin{figure}[tb]
+\begin{figure*}[tb]
 \begin{lstlisting}[style=small]
 Reserved Notation "c1 '~(' t ')~>' c2" (at level 60).
 Inductive trans : label -> config -> config -> Prop :=
@@ -40,4 +40,4 @@ Inductive trans : label -> config -> config -> Prop :=
 where "c1 '~(' t ')~>' c2" := (trans t c1 c2).
 \end{lstlisting}
 \caption{Labeled Transition Semantics in Actario}\label{fig:coq:semantics}
-\end{figure}
+\end{figure*}
