@@ -1,6 +1,6 @@
 .PHONY: pdf cont clean update final
 
-MAIN=sig-alternate
+MAIN=sigplanconf
 TEXINPUTS=".:./sty//:"
 
 pdf: $(MAIN).tex
