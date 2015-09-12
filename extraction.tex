@@ -102,7 +102,8 @@ factorial_system(N, Parent) ->
     X = spawn(fun() ->
         factorial_behv()
     end),
-    X ! {tuple_msg, {nat_msg, N}, {name_msg, Parent}},
+    X ! {tuple_msg, {nat_msg, N},
+          {name_msg, Parent}},
     empty_behv().
 \end{lstlisting}
 
