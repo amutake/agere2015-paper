@@ -23,12 +23,12 @@ For more detail about name uniqueness, see Section~\ref{sec:uniqueness}.
 %% これは動的に生成されうるアクターの名前の一意性を保つためである。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Inductive name : Set :=
-    | toplevel : string -> name
-    | generated : nat -> name -> name.
-  \end{lstlisting}
-  \caption{name}\label{coq:name}
+\begin{lstlisting}
+Inductive name : Set :=
+| toplevel : string -> name
+| generated : nat -> name -> name.
+\end{lstlisting}
+\caption{name}\label{coq:name}
 \end{figure}
 
 
@@ -40,14 +40,14 @@ If remaining actions are only \textsf{become}, the actor is ready for receiving 
 %% 残りのアクションの列が become のみの場合、このアクターはメッセージを受け取れる状態にあるということを表す。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record actor := {
-      actor_name : name;
-      remaining_actions : actions;
-      next_num : gen_number
-    }.
-  \end{lstlisting}
-  \caption{actor}\label{coq:actor}
+\begin{lstlisting}
+Record actor := {
+  actor_name : name;
+  remaining_actions : actions;
+  next_num : gen_number
+}.
+\end{lstlisting}
+\caption{actor}\label{coq:actor}
 \end{figure}
 
 \subsection{in flight message}
@@ -58,14 +58,14 @@ Next, we define \lstinline|in_flight_message| type which represents messages in 
 %% configuration に用いる。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record in_flight_message := {
-      to : name;
-      from : name;
-      content : message
-    }.
-  \end{lstlisting}
-  \caption{in flight message}\label{coq:inflight}
+\begin{lstlisting}
+Record in_flight_message := {
+  to : name;
+  from : name;
+  content : message
+}.
+\end{lstlisting}
+\caption{in flight message}\label{coq:inflight}
 \end{figure}
 
 \subsection{configuration}
@@ -74,13 +74,13 @@ configuration is used to formulate operational semantics of the Actor model.
 In Actario, a configuration consists of a list of actors and a list of messages in flight.
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record config := {
-      in_flight_messages : list in_flight_message;
-      actors : list actor
-    }.
-  \end{lstlisting}
-  \caption{config}\label{coq:config}
+\begin{lstlisting}
+Record config := {
+  in_flight_messages : list in_flight_message;
+  actors : list actor
+}.
+\end{lstlisting}
+\caption{config}\label{coq:config}
 \end{figure}
 
 
@@ -108,14 +108,14 @@ The explanations of each label are as follows.
 
 
 \begin{figure}[t]
-  \begin{lstlisting}
+\begin{lstlisting}
 Inductive label :=
 | Receive (to : name) (from : name) (content : message)
 | Send (from : name) (to : name) (content : message)
 | New (child : name)
 | Self (me : name).
-  \end{lstlisting}
-  \caption{label}\label{coq:label}
+\end{lstlisting}
+\caption{label}\label{coq:label}
 \end{figure}
 
 
