@@ -181,27 +181,27 @@ The definition in Actario is in Appendix \ref{app:lts}.
 
 \begin{figure*}[t]
   \begin{displaymath}
-    \begin{array}{rcll}
+    \begin{array}{rcl}
       (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{to}}, \textsf{become}(b), g)\}) &
       \overset{\textsf{Receive}(n_{\textrm{to}}, n_{\textrm{from}}, m)}{\leadsto} &
-      (I, A \cup \{(n_{\textrm{to}}, b(m), g)\}) &
-      \textsc{(Receive)} \\[1ex]
+      (I, A \cup \{(n_{\textrm{to}}, b(m), g)\})
+      \hfill \textsc{(Receive)} \\[1ex]
 
       (I, A \cup \{(n_{\textrm{from}}, \textsf{send}(n_{\textrm{to}}, m, \alpha), g)\}) &
       \overset{\textsf{Send}(n_{\textrm{from}}, n_{\textrm{to}}, m)}{\leadsto} &
-      (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{from}}, \alpha, g)\}) &
-      \textsc{(Send)} \\[1ex]
+      (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{from}}, \alpha, g)\}) \\
+      & & \hfill \textsc{(Send)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{new}(b, \kappa), g)\}) &
       \overset{\textsf{New}(n')}{\leadsto} &
-      (I, A \cup \{(n, \kappa(n'), g + 1), (n', \textsf{become}(b), 0)\}) & \\
-      & & \hfill \textrm{where}\ n' := \textsf{generated}(g, n) &
-      \textsc{(New)} \\[1ex]
+      (I, A \cup \{(n, \kappa(n'), g + 1), (n', \textsf{become}(b), 0)\}) \\
+      & & \hfill \textrm{where}\ n' := \textsf{generated}(g, n) \\
+      & & \hfill \textsc{(New)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{self}(\kappa), g)\}) &
       \overset{\textsf{Self}(n)}{\leadsto} &
-      (I, A \cup \{n, \kappa(n), g\}) &
-      \textsc{(Self)}
+      (I, A \cup \{n, \kappa(n), g\})
+      \hfill \textsc{(Self)}
     \end{array}
   \end{displaymath}
   \caption{labeled transition semantics}\label{fig:semantics}
