@@ -60,7 +60,7 @@ We define a predicate of configuration, called \texttt{chain}.
 \begin{displaymath}
   \begin{array}{l}
     \texttt{chain}(c) := \\
-    \quad \forall a \in \texttt{actors}(c), \exists p, p = \texttt{parent}(a) \Rightarrow p \in \texttt{actors}(c)
+    \quad \forall a \in \texttt{actors}(c), \forall p, p = \texttt{parent}(a) \Rightarrow p \in \texttt{actors}(c)
   \end{array}
 \end{displaymath}
 
@@ -86,8 +86,8 @@ We translate the proposition that next generated name is fresh to the following.
 \begin{displaymath}
   \begin{array}{l}
     \texttt{gen\_fresh}(c) := \\
-    \quad \forall a \in \texttt{actors}(c), \exists p, p = \texttt{parent}(a) \wedge \quad \quad p \in \texttt{actors}(c) \Rightarrow \\
-    \texttt{gen\_number}(a) < \texttt{next\_number}(p)
+    \quad \forall a \in \texttt{actors}(c), \forall p, p = \texttt{parent}(a) \wedge p \in \texttt{actors}(c) \Rightarrow \\
+    \quad \quad \quad \quad \texttt{gen\_number}(a) < \texttt{next\_number}(p)
   \end{array}
 \end{displaymath}
 
