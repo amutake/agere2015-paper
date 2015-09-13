@@ -93,10 +93,10 @@ The explanations of each label are as follows.
 %% 以下にそれぞれの説明を示す。
 
 \begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
-\item[\texttt{Receive (to : name) (from : name) (content : message)}]
+\item[\texttt{Receive (to : name) (from : name) \\ (content : message)}]
   This represents that the actor named \lstinline|to| receives the message \lstinline|content| sent from the actor named \lstinline|from|.
   %% \texttt{to} という名前のアクターが \texttt{from} という名前のアクターからのメッセージ \texttt{content} を受け取って遷移したということを表す。
-\item[\texttt{Send (from : name) (to : name) (content : message)}]
+\item[\texttt{Send (from : name) (to : name) \\ (content : message)}]
   This represents that the actor named \lstinline|from| sends the message \lstinline|content| to the actor named \lstinline|to|.
   %% \texttt{from} という名前のアクターが \texttt{to} という名前のアクターに向けてメッセージ \texttt{content} を送ってシステムが遷移したということを表す。
 \item[\texttt{New (child : name)}]
