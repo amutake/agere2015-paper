@@ -17,15 +17,15 @@ Value constructor is extracted to a label, and arguments are extracted to the se
 Figure~\ref{coq:adt} is an example of extraction of the natural number type.
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    (* Inductive nat :=  *)
-    (* | O : nat         *)
-    (* | S : nat -> nat. *)
+\begin{lstlisting}
+(* Inductive nat :=  *)
+(* | O : nat         *)
+(* | S : nat -> nat. *)
 
-    O (* => {o} *)
-    S (S (S O)) (* => {s, {s, {s, o}}} *)
-  \end{lstlisting}
-  \caption{example of extraction of algebraic data types}\label{coq:adt}
+O (* => {o} *)
+S (S (S O)) (* => {s, {s, {s, o}}} *)
+\end{lstlisting}
+\caption{example of extraction of algebraic data types}\label{coq:adt}
 \end{figure}
 
 However, actions of actors, for example, \textsf{send}, \textsf{new}, \textsf{self}, \textsf{become} and \texttt{behavior} are implemented as value constructor of \texttt{actions} and \texttt{behavior} type
@@ -37,7 +37,7 @@ We handle these constructors as special to generate the corresponding syntax of 
 For example, Actario code shown in Figure~\ref{coq:extractionex} is extracted to Erlang code shown in Figure~\ref{erl:extractionex}.
 
 \begin{figure}[t]
-  \begin{lstlisting}
+\begin{lstlisting}
 CoFixpoint behvA :=
   receive (fun msg =>
     match msg with
@@ -50,12 +50,12 @@ CoFixpoint behvA :=
         child ! msg;
         become behvA
     end)
-  \end{lstlisting}
-  \caption{Extraction example: Actario code}\label{coq:extractionex}
+\end{lstlisting}
+\caption{Extraction example: Actario code}\label{coq:extractionex}
 \end{figure}
 
 \begin{figure}[t]
-  \begin{lstlisting}[language=erlang]
+\begin{lstlisting}[language=erlang]
 behvA() ->
   receive Msg -> case Msg of
     {name_msg, Sender} ->
@@ -67,8 +67,8 @@ behvA() ->
       Child ! Msg
       behvA()
   end.
-  \end{lstlisting}
-  \caption{Extraction example: Erlang code}\label{erl:extractionex}
+\end{lstlisting}
+\caption{Extraction example: Erlang code}\label{erl:extractionex}
 \end{figure}
 
 \subsection{Name}
@@ -85,12 +85,14 @@ So Actario's programmers have to write executor to execute the extracted Actor s
 For example, we consider factorial system described in Section~\ref{sec:overview}.
 
 \begin{lstlisting}
-Definition factorial_system (n : nat) (parent : name) : config :=
+Definition factorial_system (n : nat)
+    (parent : name) : config :=
   init "factorial" (
-         x <- new factorial_behv;
-         x ! tuple_msg (nat_msg n) (name_msg parent);
-         become empty_behv
-       ).
+    x <- new factorial_behv;
+    x ! tuple_msg (nat_msg n)
+          (name_msg parent);
+    become empty_behv
+  ).
 \end{lstlisting}
 
 \lstinline|factorial_system| is extracted to the following Erlang code.
@@ -100,7 +102,8 @@ factorial_system(N, Parent) ->
     X = spawn(fun() ->
         factorial_behv()
     end),
-    X ! {tuple_msg, {nat_msg, N}, {name_msg, Parent}},
+    X ! {tuple_msg, {nat_msg, N},
+          {name_msg, Parent}},
     empty_behv().
 \end{lstlisting}
 
@@ -112,18 +115,21 @@ To execute this, we have to write executor like the following.
 -export([fact/1]).
 
 fact(N) ->
-    _ = spawn(factorial, factorial_system, [int2nat(N), self()]),
-    receive
-        {nat_msg, Result} ->
-            io:fwrite("fact(~w) = ~w~n", [N, nat2int(Result)]);
-        _ ->
-            io:fwrite("error~n")
-    end.
+  _ = spawn(factorial, factorial_system,
+        [int2nat(N), self()]),
+  receive
+    {nat_msg, Result} ->
+      io:fwrite("fact(~w) = ~w~n",
+        [N, nat2int(Result)]);
+    _ ->
+      io:fwrite("error~n")
+ end.
 
 nat2int({o}) -> 0;
 nat2int({s, N}) -> nat2int(N) + 1.
 
 int2nat(0) -> {o};
-int2nat(N) when N > 0 -> {s, int2nat(N - 1)};
+int2nat(N) when N > 0 ->
+  {s, int2nat(N - 1)};
 int2nat(_) -> {o}.
 \end{lstlisting}

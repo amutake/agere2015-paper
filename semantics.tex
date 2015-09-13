@@ -23,12 +23,12 @@ For more detail about name uniqueness, see Section~\ref{sec:uniqueness}.
 %% これは動的に生成されうるアクターの名前の一意性を保つためである。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Inductive name : Set :=
-    | toplevel : string -> name
-    | generated : nat -> name -> name.
-  \end{lstlisting}
-  \caption{name}\label{coq:name}
+\begin{lstlisting}
+Inductive name : Set :=
+ | toplevel : string -> name
+ | generated : nat -> name -> name.
+\end{lstlisting}
+\caption{name}\label{coq:name}
 \end{figure}
 
 
@@ -40,32 +40,32 @@ If remaining actions are only \textsf{become}, the actor is ready for receiving 
 %% 残りのアクションの列が become のみの場合、このアクターはメッセージを受け取れる状態にあるということを表す。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record actor := {
-      actor_name : name;
-      remaining_actions : actions;
-      next_num : gen_number
-    }.
-  \end{lstlisting}
-  \caption{actor}\label{coq:actor}
+\begin{lstlisting}
+Record actor := {
+  actor_name : name;
+  remaining_actions : actions;
+  next_num : gen_number
+}.
+\end{lstlisting}
+\caption{actor}\label{coq:actor}
 \end{figure}
 
 \subsection{in flight message}
 Next, we define \lstinline|in_flight_message| type which represents messages in flight in the configuration.
-\lstinline|in_flight_message| consists of the name of the destination, the name of the sender, and the content of the message (Figure~\ref{coq:inflight}).
+\break\lstinline|in_flight_message| consists of the name of the destination, the name of the sender, and the content of the message (Figure~\ref{coq:inflight}).
 %% 宛先と送り主とメッセージの内容からなるレコード型である (図\ref{coq:inflight}))。
 %% まだ受け取られていないメッセージを表す。
 %% configuration に用いる。
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record in_flight_message := {
-      to : name;
-      from : name;
-      content : message
-    }.
-  \end{lstlisting}
-  \caption{in flight message}\label{coq:inflight}
+\begin{lstlisting}
+Record in_flight_message := {
+  to : name;
+  from : name;
+  content : message
+}.
+\end{lstlisting}
+\caption{in flight message}\label{coq:inflight}
 \end{figure}
 
 \subsection{configuration}
@@ -74,13 +74,14 @@ configuration is used to formulate operational semantics of the Actor model.
 In Actario, a configuration consists of a list of actors and a list of messages in flight.
 
 \begin{figure}[t]
-  \begin{lstlisting}
-    Record config := {
-      in_flight_messages : list in_flight_message;
-      actors : list actor
-    }.
-  \end{lstlisting}
-  \caption{config}\label{coq:config}
+\begin{lstlisting}
+Record config := {
+  in_flight_messages :
+    list in_flight_message;
+  actors : list actor
+}.
+\end{lstlisting}
+\caption{config}\label{coq:config}
 \end{figure}
 
 
@@ -92,10 +93,10 @@ The explanations of each label are as follows.
 %% 以下にそれぞれの説明を示す。
 
 \begin{description}[style=nextline,leftmargin=12pt,parsep=0pt]
-\item[\texttt{Receive (to : name) (from : name) (content : message)}]
+\item[\texttt{Receive (to : name) (from : name) \\ (content : message)}]
   This represents that the actor named \lstinline|to| receives the message \lstinline|content| sent from the actor named \lstinline|from|.
   %% \texttt{to} という名前のアクターが \texttt{from} という名前のアクターからのメッセージ \texttt{content} を受け取って遷移したということを表す。
-\item[\texttt{Send (from : name) (to : name) (content : message)}]
+\item[\texttt{Send (from : name) (to : name) \\ (content : message)}]
   This represents that the actor named \lstinline|from| sends the message \lstinline|content| to the actor named \lstinline|to|.
   %% \texttt{from} という名前のアクターが \texttt{to} という名前のアクターに向けてメッセージ \texttt{content} を送ってシステムが遷移したということを表す。
 \item[\texttt{New (child : name)}]
@@ -108,14 +109,16 @@ The explanations of each label are as follows.
 
 
 \begin{figure}[t]
-  \begin{lstlisting}
+\begin{lstlisting}
 Inductive label :=
-| Receive (to : name) (from : name) (content : message)
-| Send (from : name) (to : name) (content : message)
-| New (child : name)
-| Self (me : name).
-  \end{lstlisting}
-  \caption{label}\label{coq:label}
+ | Receive (to : name) (from : name)
+     (content : message)
+ | Send (from : name) (to : name)
+     (content : message)
+ | New (child : name)
+ | Self (me : name).
+\end{lstlisting}
+\caption{label}\label{coq:label}
 \end{figure}
 
 
@@ -131,7 +134,8 @@ For the later explanation, we define the symbols as shown in Figure~\ref{fig:con
     \begin{array}{rclcl}
       c & \in & \textit{Configuration} & =   & \textit{Set(InFlight)} \times \textit{Set(Actor)} \\
       a & \in & \textit{Actor}  & =   & \textit{Name} \times \textit{Actions} \times \mathbb{N} \\
-      n & \in & \textit{Name}   & ::= & \textsf{toplevel}(s) \mid \textsf{generated}(g, n) \\
+      n & \in & \textit{Name}   & ::= & \textsf{toplevel}(s) \\
+        &     &                 &   | & \textsf{generated}(g, n) \\
       m & \in & \textit{Message} & =  & \textit{Name} + \textit{PrimVal} + \\
         &     &                 &     & \textit{Message} \times \cdots \times \textit{Message} \\
       i & \in & \textit{InFlight} & = & \textit{Name} \times \textit{Name} \times \textit{Message} \\
@@ -144,7 +148,7 @@ For the later explanation, we define the symbols as shown in Figure~\ref{fig:con
         &     &                 &   | & \textsf{Send}(n, n, m) \\
         &     &                 &   | & \textsf{New}(n) \\
         &     &                 &   | & \textsf{Self}(n) \\
-      \kappa & \in & \textit{Name} \rightarrow \textit{Actions} & & \\
+      \kappa & \in & \textit{Name} \rightarrow \textit{Actions} \\
       g & \in & \mathbb{N} & &
     \end{array}
   \end{displaymath}
@@ -181,27 +185,27 @@ The definition in Actario is in Appendix \ref{app:lts}.
 
 \begin{figure*}[t]
   \begin{displaymath}
-    \begin{array}{rcll}
+    \begin{array}{rcl}
       (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{to}}, \textsf{become}(b), g)\}) &
       \overset{\textsf{Receive}(n_{\textrm{to}}, n_{\textrm{from}}, m)}{\leadsto} &
-      (I, A \cup \{(n_{\textrm{to}}, b(m), g)\}) &
-      \textsc{(Receive)} \\[1ex]
+      (I, A \cup \{(n_{\textrm{to}}, b(m), g)\})
+      \hfill \textsc{(Receive)} \\[1ex]
 
       (I, A \cup \{(n_{\textrm{from}}, \textsf{send}(n_{\textrm{to}}, m, \alpha), g)\}) &
       \overset{\textsf{Send}(n_{\textrm{from}}, n_{\textrm{to}}, m)}{\leadsto} &
-      (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{from}}, \alpha, g)\}) &
-      \textsc{(Send)} \\[1ex]
+      (I \uplus \{(n_{\textrm{to}}, n_{\textrm{from}}, m)\}, A \cup \{(n_{\textrm{from}}, \alpha, g)\}) \\
+      & & \hfill \textsc{(Send)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{new}(b, \kappa), g)\}) &
       \overset{\textsf{New}(n')}{\leadsto} &
-      (I, A \cup \{(n, \kappa(n'), g + 1), (n', \textsf{become}(b), 0)\}) & \\
-      & & \hfill \textrm{where}\ n' := \textsf{generated}(g, n) &
-      \textsc{(New)} \\[1ex]
+      (I, A \cup \{(n, \kappa(n'), g + 1), (n', \textsf{become}(b), 0)\}) \\
+      & & \hfill \textrm{where}\ n' := \textsf{generated}(g, n) \\
+      & & \hfill \textsc{(New)} \\[1ex]
 
       (I, A \cup \{(n, \textsf{self}(\kappa), g)\}) &
       \overset{\textsf{Self}(n)}{\leadsto} &
-      (I, A \cup \{n, \kappa(n), g\}) &
-      \textsc{(Self)}
+      (I, A \cup \{n, \kappa(n), g\})
+      \hfill \textsc{(Self)}
     \end{array}
   \end{displaymath}
   \caption{labeled transition semantics}\label{fig:semantics}

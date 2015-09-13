@@ -26,11 +26,13 @@ And we define the predicate that the given path is correct transition path.
 %% また、与えられた transition path が確かに transition path になっているか、という述語を定義する。すべての index n について、n 番目の configuration が存在するならば、n + 1 番目の configuration が存在するならそれは遷移できるものか、それ以上遷移できない。n 番目の configuration が存在しないならば、その次の configuration も存在しない、という意味である。
 
 \begin{lstlisting}
-Definition is_transition_path (p : path) : Prop :=
+Definition is_transition_path
+    (p : path) : Prop :=
   forall n,
     (forall c, p n = Some c ->
-               (exists c' l, p (S n) = Some c' /\ c ~(l)~> c') \/
-               p (S n) = None) /\
+      (exists c' l, p (S n) = Some c' /\
+        c ~(l)~> c') \/
+      p (S n) = None) /\
     (p n = None -> p (S n) = None).
 \end{lstlisting}
 
@@ -40,7 +42,8 @@ In Actario, \texttt{enabled} is defined as there exists a configuration after tr
 %% ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
 
 \begin{lstlisting}
-Definition enabled (c : config) (l : label) : Prop :=
+Definition enabled (c : config)
+    (l : label) : Prop :=
   exists c', c ~(l)~> c'.
 \end{lstlisting}
 
@@ -50,12 +53,13 @@ It is named \texttt{infinitely often enabled}.
 %% これは、すべての index n について、n 番目の configuration があるラベルによって遷移が可能ならば、その先そのラベルによって遷移が可能になる configuration が存在する、と定義する。
 
 \begin{lstlisting}
-Definition infinitely_often_enabled (l : label) (p : path) : Prop :=
+Definition infinitely_often_enabled
+    (l : label) (p : path) : Prop :=
   forall n c, p n = Some c ->
-              enabled c l ->
-              exists m c', m > n /\
-                           p m = Some c' /\
-                           enabled c' l.
+    enabled c l ->
+    exists m c', m > n /\
+      p m = Some c' /\
+      enabled c' l.
 \end{lstlisting}
 
 
@@ -65,9 +69,12 @@ It represents that the transition with the label is processed eventually in the 
 It is defined as follows.
 
 \begin{lstlisting}
-Definition eventually_processed (l : label) (p : path) : Prop :=
+Definition eventually_processed
+    (l : label) (p : path) : Prop :=
   exists n c c',
-    p n = Some c /\ p (S n) = Some c' /\ c ~(l)~> c'.
+    p n = Some c /\
+    p (S n) = Some c' /\
+    c ~(l)~> c'.
 \end{lstlisting}
 
 
@@ -79,12 +86,13 @@ If \texttt{is postfix of} is not used, the transition may not be processed after
 To prevent it, if \texttt{inifinitely often enabled} holds then \texttt{eventually processed} holds for arbitrary postfix path by using \texttt{is postfix path}.
 
 \begin{lstlisting}
-Definition is_postfix_of (p' p : path) : Prop :=
+Definition is_postfix_of
+    (p' p : path) : Prop :=
   exists n, (forall m, p' m = p (m + n)).
 
 Definition fairness : Prop :=
   forall p p', is_postfix_of p' p ->
-               (forall l,
-                  infinitely_often_enabled l p' ->
-                  eventually_processed l p').
+    (forall l,
+      infinitely_often_enabled l p' ->
+      eventually_processed l p').
 \end{lstlisting}

@@ -1,0 +1,264 @@
+%-----------------------------------------------------------------------------
+%
+%               Template for sigplanconf LaTeX Class
+%
+% Name:         sigplanconf-template.tex
+%
+% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
+%               file for SIGPLAN conference proceedings.
+%
+% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
+%               sigplanconf-guide.pdf
+%
+% Author:       Paul C. Anagnostopoulos
+%               Windfall Software
+%               978 371-2316
+%               paul@windfall.com
+%
+% Created:      15 February 2005
+%
+%-----------------------------------------------------------------------------
+
+
+\documentclass[10pt]{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{listings,lstcoq,lsterlang}
+\usepackage{bcprules}
+\usepackage{url}
+\usepackage{enumitem}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+
+\lstdefinestyle{default}{
+  language=coq,
+  basicstyle={\ttfamily\normalsize},
+  breaklines=true,
+  % frame=tb,
+  framesep=6pt,
+  captionpos=b,
+  numberstyle=\scriptsize,
+  numbers=left,
+  numbersep=6pt,
+  xleftmargin=12pt,
+  aboveskip=1em,
+  belowskip=1em,
+}
+\lstdefinestyle{small}{
+  style=default,
+  basicstyle={\ttfamily\small},
+}
+\lstset{
+  style=default
+}
+
+\begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
+\conferenceinfo{AGERE!@SPLASH}{Oct., 2015, Pittsburgh, PA, USA}
+\copyrightyear{20yy}
+\copyrightdata{978-1-nnnn-nnnn-n/yy/mm}
+\doi{nnnnnnn.nnnnnnn}
+
+% Uncomment one of the following two, if you are not going for the
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish,
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers,
+                                  % short abstracts)
+
+%% \titlebanner{banner above paper title}        % These are ignored unless
+%% \preprintfooter{short description of paper}   % 'preprint' option specified.
+
+\title{Actario: A Framework for Reasoning About Actor Systems}
+%% \subtitle{Subtitle Text, if any}
+
+\authorinfo{Shohei Yasutake}
+           {Tokyo Institute of Technology}
+           {yasutake@psg.cs.titech.ac.jp}
+\authorinfo{Takuo Watanabe}
+           {Tokyo Institute of Technology}
+           {takuo@acm.org}
+
+\maketitle
+
+\begin{abstract}
+The two main characteristics of the Actor model are asynchronous message passing and dynamic system topology. The latter relies on the on-the-fly creation of actor names that often complicates the formal treatment of systems described in the Actor model. In this paper, we introduce Actario, a formalization of the Actor model in Coq. Actario incorporates a name creation mechanism that is formally proven to generate a consistent set of actor names. The mechanism helps proper handling of names in modeling and reasoning about actor-based systems. Actario also provides a code extraction mechanism that generates Erlang programs.
+\end{abstract}
+
+\category{F.3.2}{Logics and Meanings of Programs}%
+{Specifying and Verifying and Reasoning about Programs}%
+[Mechanical verification]
+
+% general terms are not compulsory anymore,
+% you may leave them out
+\terms{Actors, Formal Models}
+
+\keywords{Actor Model, Formalization, Actario, Coq, Erlang}
+
+\input{./introduction.tex}
+\newpage % oveview のタイトルだけが前ページに残ったため
+\input{./overview.tex}
+\input{./semantics.tex}
+\input{./uniqueness.tex}
+\input{./fairness.tex}
+\input{./extraction.tex}
+\input{./related-work.tex}
+\input{./conclusion.tex}
+\input{./appendix.tex}
+
+% We recommend abbrvnat bibliography style.
+
+\bibliographystyle{abbrvnat}
+
+% The bibliography should be embedded for final submission.
+
+\begin{thebibliography}{15}
+\softraggedright
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Actario()]{Actario}
+Actario.
+\newblock Actario: A framework for verifying actor based systems.
+\newblock \url{https://github.com/amutake/actario}.
+
+\bibitem[Affeldt and Kobayashi(2008)]{Affeldt200817}
+R.~Affeldt and N.~Kobayashi.
+\newblock A {Coq} library for verification of concurrent programs.
+\newblock In \emph{Fourth International Workshop on Logical Frameworks and
+  Meta-Languages (LFM 2004)}, volume 199 of \emph{Electronic Notes in
+  Theoretical Computer Science}, pages 17--32, 2008.
+\newblock \doi{10.1016/j.entcs.2007.11.010}.
+\newblock URL
+  \url{http://www.sciencedirect.com/science/article/pii/S1571066108000765}.
+
+\bibitem[Agha(1986)]{Agha:1986aa}
+G.~Agha.
+\newblock \emph{Actors: A Model of Concurrent Computation in Distributed
+  Systems}.
+\newblock MIT Press, 1986.
+\newblock URL \url{http://mitpress.mit.edu/books/actors}.
+
+\bibitem[Akka()]{Akka}
+Akka.
+\newblock Akka.
+\newblock \url{http://akka.io/}.
+
+\bibitem[Arkoudas()]{Athena}
+K.~Arkoudas.
+\newblock Athena.
+\newblock \url{http://proofcentral.org/athena}.
+
+\bibitem[{De Koster} et~al.(2012){De Koster}, {Van Cutsem}, and
+  D'Hondt]{De-Koster:2012aa}
+J.~{De Koster}, T.~{Van Cutsem}, and T.~D'Hondt.
+\newblock Domains: Safe sharing among actors.
+\newblock In \emph{Proceedings of the 2nd edition on Programming Systems,
+  Languages and Applications based on Actors, Agents, and Decentralized Control
+  Abstractions (AGERE!@SPLASH 2012)}, pages 11--22. ACM, ACM, 2012.
+\newblock \doi{10.1145/2414639.2414644}.
+
+\bibitem[Erlang()]{Erlang}
+Erlang.
+\newblock Erlang programming language.
+\newblock \url{http://www.erlang.org/}.
+
+\bibitem[Garnock-Jones et~al.(2014)Garnock-Jones, Tobin-Hochstadt, and
+  Felleisen]{Garnock-Jones:2014aa}
+T.~Garnock-Jones, S.~Tobin-Hochstadt, and M.~Felleisen.
+\newblock The network as a language construct.
+\newblock In \emph{Programming Languages and Systems (ESOP 2014)}, volume 8410
+  of \emph{Lecture Notes in Computer Science}, pages 473--492. Springer-Verlag,
+  2014.
+\newblock \doi{10.1007/978-3-642-54833-8_25}.
+\newblock URL \url{http://www.ccs.neu.edu/home/tonyg/esop2014/}.
+
+\bibitem[Musser and Varela(2013)]{Musser:2013aa}
+D.~R. Musser and C.~A. Varela.
+\newblock Structured reasoning about actor systems.
+\newblock In \emph{Workshop on Programming based on Actors, Agents, and
+  Decentralized Control (AGERE!@SPLASH 2013)}, pages 37--48. ACM, oct 2013.
+\newblock \doi{10.1145/2541329.2541334}.
+
+\bibitem[Scala()]{Scala}
+Scala.
+\newblock The {Scala} programming language.
+\newblock \url{http://scala-lang.org/}.
+
+\bibitem[Sirjani and Jaghoori(2011)]{Sirjani:2011aa}
+M.~Sirjani and M.~M. Jaghoori.
+\newblock Ten years of analyzing actors: {Rebeca} experience.
+\newblock In G.~Agha, O.~Danvy, and J.~Meseguer, editors, \emph{Formal
+  Modeling: Actors, Open Systems, Biological Systems}, volume 7000 of
+  \emph{Lecture Notes in Computer Science}, pages 20--56. Springer-Verlag,
+  2011.
+\newblock \doi{10.1007/978-3-642-24933-4_3}.
+
+\bibitem[Talcott et~al.(2011)Talcott, Sirjani, and Ren]{Talcott:2011aa}
+C.~Talcott, M.~Sirjani, and S.~Ren.
+\newblock Comparing three coordination models: {Reo}, {ARC}, and {PBRD}.
+\newblock \emph{Science of Computer Programming}, 76\penalty0 (1):\penalty0
+  3--22, 2011.
+\newblock \doi{10.1016/j.scico.2009.11.006}.
+
+\bibitem[Watanabe(2013)]{Watanabe:2013aa}
+T.~Watanabe.
+\newblock Towards a compositional reflective architecture for actor-based
+  systems.
+\newblock In \emph{Workshop on Programming based on Actors, Agents, and
+  Decentralized Control (AGERE!@SPLASH 2013)}, pages 19--24. ACM, oct 2013.
+\newblock \doi{10.1145/2541329.2541341}.
+
+\bibitem[Wilcox et~al.(2015)Wilcox, Woos, Panchekha, Tatlock, Wang, Ernst, and
+  Anderson]{Verdi}
+J.~R. Wilcox, D.~Woos, P.~Panchekha, Z.~Tatlock, X.~Wang, M.~D. Ernst, and
+  T.~Anderson.
+\newblock Verdi: A framework for implementing and formally verifying
+  distributed systems.
+\newblock In \emph{Proceedings of the 36th ACM SIGPLAN Conference on
+  Programming Language Design and Implementation}, PLDI 2015, pages 357--368,
+  New York, NY, USA, 2015. ACM.
+\newblock ISBN 978-1-4503-3468-6.
+\newblock \doi{10.1145/2737924.2737958}.
+\newblock URL \url{http://doi.acm.org/10.1145/2737924.2737958}.
+
+\bibitem[Yonezawa et~al.(1986)Yonezawa, Briot, and Shibayama]{Yonezawa:1986aa}
+A.~Yonezawa, J.-P. Briot, and E.~Shibayama.
+\newblock Object-oriented concurrent programming in {ABCL/1}.
+\newblock In \emph{OOPSLA '86 Conference Proceedings on Object-Oriented
+  Programming Systems, Languages and Applications}, pages 258--268, 1986.
+\newblock \doi{10.1145/960112.28722}.
+
+\end{thebibliography}
+
+
+\end{document}
+
+%                       Revision History
+%                       -------- -------
+%  Date         Person  Ver.    Change
+%  ----         ------  ----    ------
+
+%  2013.06.29   TU      0.1--4  comments on permission/copyright notices
