@@ -1,4 +1,4 @@
-\section{semantics}
+\section{Semantics}
 \label{sec:semantics}
 
 In this section, we explain the formalization of the operational semantics of the Actor model in Actario.
@@ -32,7 +32,7 @@ Inductive name : Set :=
 \end{figure}
 
 
-\subsection{actor}
+\subsection{Actor}
 We explain how \lstinline|actor| is defined in Actario.
 Actor consists of its name, sequence of remaining actions, and next generation number to use in generating next child (Figure~\ref{coq:actor}).
 If remaining actions are only \textsf{become}, the actor is ready for receiving a message.
@@ -50,7 +50,7 @@ Record actor := {
 \caption{actor}\label{coq:actor}
 \end{figure}
 
-\subsection{in flight message}
+\subsection{Messages in Flight}
 Next, we define \lstinline|in_flight_message| type which represents messages in flight in the configuration.
 \break\lstinline|in_flight_message| consists of the name of the destination, the name of the sender, and the content of the message (Figure~\ref{coq:inflight}).
 %% 宛先と送り主とメッセージの内容からなるレコード型である (図\ref{coq:inflight}))。
@@ -68,7 +68,7 @@ Record in_flight_message := {
 \caption{in flight message}\label{coq:inflight}
 \end{figure}
 
-\subsection{configuration}
+\subsection{Configuration}
 \textit{configuration} represents a snapshot of the actor system.
 configuration is used to formulate operational semantics of the Actor model.
 In Actario, a configuration consists of a list of actors and a list of messages in flight.
@@ -85,7 +85,7 @@ Record config := {
 \end{figure}
 
 
-\subsection{label}
+\subsection{Transition Label}
 Actario formulates operational semantics of the Actor model as labeled transition system, so we define label (Figure~\ref{coq:label}).
 The explanations of each label are as follows.
 
@@ -122,7 +122,7 @@ Inductive label :=
 \end{figure}
 
 
-\subsection{semantics}
+\subsection{Semantics}
 
 We formulate operational semantics of the Actor model as labeled transition system.
 For the later explanation, we define the symbols as shown in Figure~\ref{fig:config}.

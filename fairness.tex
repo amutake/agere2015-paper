@@ -36,7 +36,7 @@ Definition is_transition_path
     (p n = None -> p (S n) = None).
 \end{lstlisting}
 
-\subsection{enabled}
+\subsection{Enabled}
 We define the predicate that the transition from the given configuration with the given label is possible, called \texttt{enabled}.
 In Actario, \texttt{enabled} is defined as there exists a configuration after transitioning from the configuration with the label, as follows.
 %% ある遷移ができる状態にある、ということを enabed と呼ぶ。これは、ある configuration からあるラベルによって遷移した先の configuration が存在する、と定義する。
@@ -47,7 +47,7 @@ Definition enabled (c : config)
   exists c', c ~(l)~> c'.
 \end{lstlisting}
 
-\subsection{infinitely often enabled}
+\subsection{Infinitely Often Enabled}
 We define the predicate that the transition is infinitely often enabled in the transition path.
 It is named \texttt{infinitely often enabled}.
 %% これは、すべての index n について、n 番目の configuration があるラベルによって遷移が可能ならば、その先そのラベルによって遷移が可能になる configuration が存在する、と定義する。
@@ -63,7 +63,7 @@ Definition infinitely_often_enabled
 \end{lstlisting}
 
 
-\subsection{eventually processed}
+\subsection{Eventually Processed}
 We define \texttt{eventually processed} that is the predicate of label and transition path.
 It represents that the transition with the label is processed eventually in the path.
 It is defined as follows.
@@ -78,7 +78,7 @@ Definition eventually_processed
 \end{lstlisting}
 
 
-\subsection{Definition of fairness}
+\subsection{Definition of Fairness}
 Then we can define \texttt{fairness} predicate for transition path.
 For the given transition path and for each label, if \texttt{infinitely often enabled} holds, then \texttt{eventually processed} holds.
 \texttt{is postfix of} predicate is used for representing 'infinite'.
