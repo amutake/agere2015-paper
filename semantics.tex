@@ -181,7 +181,7 @@ The explanations for each of transitions are the followings.
   An actor gets the self name and applies it to the continuation.
 \end{description}
 
-The definition in Actario is in Appendix \ref{app:lts}.
+The definition in Actario is in Appendix~\ref{app:lts}.
 
 \begin{figure*}[t]
   \begin{displaymath}
@@ -210,3 +210,40 @@ The definition in Actario is in Appendix \ref{app:lts}.
   \end{displaymath}
   \caption{labeled transition semantics}\label{fig:semantics}
 \end{figure*}
+
+\subsection{Actor Persistence and Message Persistence}
+In this semantics, actor persistence property (the property that actors do not disappear) and message persistence property (the property that messages in flight do not disappear except of receiving) are formally proved.
+Each of the definitions is shown in Figure~\ref{fig:coq:actorpersistence} and Figure~\ref{fig:coq:messagepersistence}.
+The number of lines of the proofs is less than 100 lines in Actario \footnote{\url{https://github.com/amutake/actario/blob/d9e5084c87e7e0bc630ffa0f96b0b3b49d65fa9a/src/persistence.v}}.
+
+\begin{figure}[tb]
+\begin{lstlisting}[style=small]
+Theorem actor_persistence :
+  forall c c' l n,
+    n \in map actor_name (actors c) ->
+    c ~(l)~> c' ->
+    n \in map actor_name (actors c').
+\end{lstlisting}
+\caption{Actor Persistence}\label{fig:coq:actorpersistence}
+\end{figure}
+
+\begin{figure}[tb]
+\begin{lstlisting}[style=small]
+Theorem message_persistence :
+  forall c c' l m (n : nat),
+    n == count_mem m (in_flight_messages c) ->
+    c ~(l)~> c' ->
+    if l == Receive (to m) (from m)
+                    (content m) then
+      count_mem m (in_flight_messages c')
+                                       == n.-1
+    else
+      if l == Send (from m) (to m)
+                   (content m) then
+        count_mem m (in_flight_messages c')
+                                       == n.+1
+    else
+      count_mem m (in_flight_messages c') == n.
+\end{lstlisting}
+\caption{Message Persistence}\label{fig:coq:messagepersistence}
+\end{figure}
