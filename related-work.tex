@@ -5,11 +5,12 @@ Appl\(\pi\) is a Coq library for modeling and verifying concurrent programs \cit
 Actario is very inspired by Appl\(\pi\), for example, the definition of fairness, continuation passing style in \texttt{actions} and framework design.
 The main difference of Appl\(\pi\) and Actario is that Appl\(\pi\) adopts \(\pi\)-calculus for its concurrent computation basic, but Actario adopts the Actor model for its concurrent computation basic.
 
-Musser and Varela are formalized the Actor model in the Athena theorem prover \cite{Athena}\cite{Musser:2013aa}. % In this paper, transition path is defined as sequence of labels.
-In this paper, name uniqueness is proven.
-However, a programmer has to name new actors explicitly.
-Therefore, a programmer has to select a fresh name. It is difficult to give always fresh name in complex system.
-In addition, it is impossible to run the program built in the formalization, while Actario can by extraction.
+Musser and Varela\cite{Musser:2013aa} formalized the Actor model for the Athena theorem prover\cite{Athena}. % In this paper, transition path is defined as sequence of labels.
+Within their formalization, maintaining the uniqueness of actor names is formally proved.
+However, one must manually specify a fresh name for each new actor.
+In contrast, the automatic actor naming mechanism in Actario eases the specification of complex systems.
+In addition, Actraio provides an extraction mechanism of runnable Erlang code.
+
 %% これは transition path を遷移のラベルの列としている。
 %% この形式化では遷移の間で名前の一意性が証明されているが、 % note: creating, trans-create, unique-ids-persistence in transition.ath
 %% この形式化を用いてプログラミングする際には名前をプログラマが明示的に与えなければならないので、アクターを生成するときには名前が重複しないように注意深く設定しなければならない。
