@@ -16,7 +16,5 @@ update:
 	mkluatexfontdb -vvv
 
 final:
-	TEXINPUTS=$(TEXINPUTS) latex $(MAIN)
-	TEXINPUTS=$(TEXINPUTS) bibtex $(MAIN)
-	TEXINPUTS=$(TEXINPUTS) latex $(MAIN)
+	TEXINPUTS=$(TEXINPUTS) latexmk $(MAIN)
 	dvipdfmx $(MAIN).dvi
