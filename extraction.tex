@@ -6,7 +6,6 @@ Normal Coq can extract programs to OCaml, Haskell, and Scheme.
 If we want to extract to other languages or use custom extraction algorithm, we have to implement it as plugins or patches.
 Actario has custom extraction mechanism for the programs using Actario.
 It can extract to Erlang.
-It is not proven that the extraction mechanism does not change the meanings of Actario programs and Erlang programs.
 In Actario, \lstinline|ActorExtraction| command is defined for extracting actor systems.
 It is used like traditional \lstinline|Extraction| command.
 
@@ -107,9 +106,10 @@ factorial_system(N, Parent) ->
     empty_behv().
 \end{lstlisting}
 
-To execute this, we have to write executor like the following.
+To execute this, we have to write executor like Figure~\ref{fig:erl:user}.
 \lstinline[language=erlang]|nat2int| and \lstinline[language=erlang]|int2nat| are auxiliary functions for converting Coq's natural number and Erlang's integer.
 
+\begin{figure}
 \begin{lstlisting}[language=erlang]
 -module(fact_main).
 -export([fact/1]).
@@ -124,12 +124,12 @@ fact(N) ->
     _ ->
       io:fwrite("error~n")
  end.
-
-nat2int({o}) -> 0;
-nat2int({s, N}) -> nat2int(N) + 1.
-
-int2nat(0) -> {o};
-int2nat(N) when N > 0 ->
-  {s, int2nat(N - 1)};
-int2nat(_) -> {o}.
 \end{lstlisting}
+\caption{Example: user code to execute factorial system}\label{fig:erl:user}
+\end{figure}
+
+\subsection{Future Work for Erlang Extraction}
+Currently, it is not proven that the extraction mechanism does not change the meanings of Actario programs and Erlang programs and properties such as name uniqueness.
+In order to show these properties, we have to formalize Erlang in Coq and extraction mechanism, write extraction mechanism in Coq, and prove the preservation of a certain property.
+
+Furthermore, we like to provide bridge library between user code and extracted code for convenience, for example, \texttt{nat2int} and \texttt{int2nat} in Figure~\ref{fig:erl:user}.
